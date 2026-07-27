@@ -1,5 +1,5 @@
 import { defineConfig } from "astro/config";
-import tailwind from "@astrojs/tailwind";
+import tailwindcss from "@tailwindcss/vite";
 import vercel from "@astrojs/vercel";
 import sitemap from "@astrojs/sitemap";
 
@@ -8,7 +8,6 @@ export default defineConfig({
   output: "server",
   adapter: vercel(),
   integrations: [
-    tailwind(),
     sitemap({
       i18n: {
         defaultLocale: "es",
@@ -20,6 +19,9 @@ export default defineConfig({
       filter: (page) => !page.includes("/api/"),
     }),
   ],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   i18n: {
     defaultLocale: "es",
     locales: ["es", "en"],
