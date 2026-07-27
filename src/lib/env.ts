@@ -1,19 +1,14 @@
-import { loadEnv } from "vite";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
-
-const rootDir = path.resolve(fileURLToPath(new URL("../..", import.meta.url)));
-const mode = import.meta.env.MODE || process.env.NODE_ENV || "development";
-
-/** All keys from `.env` / `.env.[mode]` (empty prefix = no PUBLIC_ filter). */
-const fileEnv = loadEnv(mode, rootDir, "");
-
 /**
- * Read a server env var. Prefer file/.process env over dynamic import.meta.env
- * (Vite does not support import.meta.env[dynamicKey]).
+ * Read a server env var by dynamic key.
+ * Prefer process.env (Vercel / Node SSR), then import.meta.env for local .env values.
+ * Do not import from "vite" here — it pulls Rolldown into the serverless bundle.
  */
 export function getEnv(key: string): string {
-  const raw = fileEnv[key] ?? process.env[key] ?? "";
+  const fromProcess = process.env[key];
+  const fromMeta = (import.meta.env as Record<string, string | boolean | undefined>)[
+    key
+  ];
+  const raw = fromProcess ?? fromMeta ?? "";
   return String(raw)
     .trim()
     .replace(/^["']|["']$/g, "");
