@@ -1,0 +1,53 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
+import HeroSection from "../../components/sections/HeroSection.astro";
+import AboutSection from "../../components/sections/AboutSection.astro";
+import ServicesSection from "../../components/sections/ServicesSection.astro";
+import ProjectsSection from "../../components/sections/ProjectsSection.astro";
+import BlogSection from "../../components/sections/BlogSection.astro";
+import ResourcesSection from "../../components/sections/ResourcesSection.astro";
+import TestimonialSection from "../../components/sections/TestimonialSection.astro";
+import ContactSection from "../../components/sections/ContactSection.astro";
+
+const locale = "en";
+
+let posts: Array<{
+  id: string;
+  title: string;
+  excerpt?: string;
+  category?: string;
+  readTime?: string;
+  image?: string;
+  date?: string;
+}> = [];
+
+try {
+  const res = await fetch(`https://blog.agustin.top/api/posts?locale=${locale}`);
+  if (res.ok) {
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : (data.posts ?? data.data ?? []);
+    posts = list.slice(0, 3);
+  }
+} catch {
+  /* blog API unavailable at build time */
+}
+---
+
+<BaseLayout locale={locale} canonicalPath="">
+  <Navbar locale={locale} />
+  <main>
+    <HeroSection locale={locale} />
+    <AboutSection locale={locale} />
+    <ServicesSection locale={locale} />
+    <ProjectsSection locale={locale} />
+    <BlogSection locale={locale} posts={posts} />
+    <ResourcesSection locale={locale} />
+    <TestimonialSection locale={locale} />
+    <ContactSection locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</BaseLayout>

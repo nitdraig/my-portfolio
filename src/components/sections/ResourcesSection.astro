@@ -1,0 +1,216 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { resources } from "../../data/resources";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].resources;
+---
+
+<section id="resources" class="py-20 px-4 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.title}</h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">{t.subtitle}</p>
+    </div>
+
+    {
+      resources.length > 0 ? (
+        <div
+          class:list={[
+            "grid gap-8",
+            resources.length === 1
+              ? "grid-cols-1 justify-items-center max-w-md mx-auto"
+              : "md:grid-cols-2 lg:grid-cols-3",
+          ]}
+        >
+          {
+            resources.map((resource) => (
+              <article
+                class="group flex flex-col cursor-pointer reveal border border-gray-200 rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full bg-white resource-card"
+                data-id={resource.id}
+                data-title={resource.title[locale]}
+                data-subtitle={resource.subtitle[locale]}
+                data-description={resource.description[locale]}
+                data-highlights={JSON.stringify(resource.highlights[locale])}
+                data-tags={JSON.stringify(resource.tags)}
+                data-download={resource.downloadUrl}
+                data-cover={resource.coverImage ?? ""}
+                data-is-free={resource.isFree ? "1" : "0"}
+                data-is-new={resource.isNew ? "1" : "0"}
+                data-is-featured={resource.isFeatured ? "1" : "0"}
+              >
+                <div class="relative h-48 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden">
+                  {
+                    resource.coverImage ? (
+                      <img
+                        src={resource.coverImage}
+                        alt={resource.title[locale]}
+                        class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-110 group-hover:rotate-[2deg] transition-transform duration-300"
+                        width="400"
+                        height="192"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div class="text-center p-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/80 mx-auto mb-4" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                        <p class="text-white/60 text-sm">{t.coverFallback}</p>
+                      </div>
+                    )
+                  }
+
+                  <div class="absolute top-3 left-3 flex flex-col gap-2 z-10">
+                    {resource.isNew && (
+                      <span class="inline-flex items-center rounded-full bg-green-500 text-white px-2 py-0.5 text-xs font-medium">
+                        {t.new}
+                      </span>
+                    )}
+                    {resource.isFree && (
+                      <span class="inline-flex items-center rounded-full bg-blue-500 text-white px-2 py-0.5 text-xs font-medium">
+                        {t.free}
+                      </span>
+                    )}
+                    {resource.isFeatured && (
+                      <span class="inline-flex items-center rounded-full bg-purple-500 text-white px-2 py-0.5 text-xs font-medium">
+                        {t.featured}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div class="p-6 pb-3 flex-1">
+                  <h3 class="text-lg font-semibold text-gray-900 group-hover:text-gray-700 transition-colors line-clamp-2">
+                    {resource.title[locale]}
+                  </h3>
+                  <p class="text-gray-600 mt-1 line-clamp-3">{resource.subtitle[locale]}</p>
+                </div>
+
+                <div class="px-6 pb-6 mt-auto">
+                  <div class="flex flex-wrap gap-2 mb-4 min-h-[1.75rem]">
+                    {
+                      resource.tags.map((tag) => (
+                        <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                          {tag}
+                        </span>
+                      ))
+                    }
+                  </div>
+                  <div class="flex gap-2">
+                    <a
+                      href={resource.downloadUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="group/dl flex-1 inline-flex items-center justify-center rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm font-medium hover:bg-gray-50 resource-download-link"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-0 w-0 opacity-0 overflow-hidden group-hover/dl:mr-1 group-hover/dl:w-3 group-hover/dl:opacity-100 transition-all duration-200" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                      {t.downloadLabel}
+                    </a>
+                    <button
+                      type="button"
+                      class="group/view flex-1 inline-flex items-center justify-center rounded-md bg-gray-900 hover:bg-gray-800 text-white px-3 py-2 text-sm font-medium resource-open-btn"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-0 w-0 opacity-0 overflow-hidden group-hover/view:mr-1 group-hover/view:w-3 group-hover/view:opacity-100 transition-all duration-200" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                      {t.viewLabel}
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      ) : (
+        <div class="text-center py-12 reveal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 mx-auto mb-4" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          <p class="text-gray-600">{t.comingSoon}</p>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<dialog id="resource-dialog" class="rounded-lg shadow-xl border border-gray-200 p-0 max-w-3xl w-[calc(100%-2rem)] max-h-[90vh] backdrop:bg-black/50">
+  <div class="p-6 overflow-y-auto max-h-[90vh]">
+    <div id="resource-dialog-header" class="flex items-start gap-4 mb-4"></div>
+    <div id="resource-dialog-body" class="space-y-6"></div>
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+      <button type="button" id="resource-dialog-close" class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50">
+        {t.close}
+      </button>
+      <a id="resource-dialog-download" href="#" target="_blank" rel="noopener noreferrer" class="rounded-md bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 text-sm font-medium">
+        {t.download}
+      </a>
+    </div>
+  </div>
+</dialog>
+
+<script define:vars={{ locale, labels: t }}>
+  const dialog = document.getElementById("resource-dialog");
+  const header = document.getElementById("resource-dialog-header");
+  const body = document.getElementById("resource-dialog-body");
+  const closeBtn = document.getElementById("resource-dialog-close");
+  const downloadLink = document.getElementById("resource-dialog-download");
+
+  function openResourceModal(card) {
+    if (!dialog || !header || !body || !downloadLink) return;
+
+    const title = card.dataset.title ?? "";
+    const subtitle = card.dataset.subtitle ?? "";
+    const description = card.dataset.description ?? "";
+    const highlights = JSON.parse(card.dataset.highlights ?? "[]");
+    const tags = JSON.parse(card.dataset.tags ?? "[]");
+    const download = card.dataset.download ?? "#";
+    const cover = card.dataset.cover ?? "";
+    const isFree = card.dataset.isFree === "1";
+
+    header.innerHTML = `
+      ${cover ? `<img src="${cover}" alt="" class="w-32 h-48 object-cover rounded-lg flex-shrink-0" />` : ""}
+      <div class="flex-1">
+        <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">${title}</h2>
+        <p class="text-base text-gray-600 mb-4">${subtitle}</p>
+      </div>
+    `;
+
+    body.innerHTML = `
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">${labels.description}</h3>
+        <p class="text-gray-600 leading-relaxed">${description}</p>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">${labels.whatsIncluded}</h3>
+        <ul class="space-y-3">
+          ${highlights.map((h) => `<li class="flex items-start gap-3"><span class="text-green-600 mt-0.5">✓</span><span class="text-gray-700">${h}</span></li>`).join("")}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">${labels.tags}</h3>
+        <div class="flex flex-wrap gap-2">
+          ${tags.map((tag) => `<span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-sm text-gray-700">${tag}</span>`).join("")}
+        </div>
+      </div>
+    `;
+
+    downloadLink.href = download;
+    downloadLink.textContent = isFree ? labels.download : labels.getNow;
+    dialog.showModal();
+  }
+
+  document.querySelectorAll(".resource-card").forEach((card) => {
+    card.addEventListener("click", () => openResourceModal(card));
+    card.querySelector(".resource-open-btn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openResourceModal(card);
+    });
+    card.querySelectorAll(".resource-download-link").forEach((link) => {
+      link.addEventListener("click", (e) => e.stopPropagation());
+    });
+  });
+
+  closeBtn?.addEventListener("click", () => dialog?.close());
+  dialog?.addEventListener("click", (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+</script>

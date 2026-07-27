@@ -1,0 +1,63 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { projects } from "../../data/projects";
+import type { projects as projectsData } from "../../data/projects";
+
+type Project = (typeof projectsData)[number];
+
+interface Props {
+  locale: Locale;
+  project: Project;
+}
+
+const { locale, project } = Astro.props;
+const t = ui[locale].projectDetail;
+const prefix = `/${locale}`;
+const related = projects.filter((p) => p.slug !== project.slug).slice(0, 3);
+---
+
+<section class="py-20 px-4 bg-gray-50">
+  <div class="max-w-6xl mx-auto">
+    <h3 class="text-3xl font-bold text-gray-900 mb-12 text-center reveal">{t.moreProjects}</h3>
+
+    {
+      related.length > 0 && (
+        <div class="grid md:grid-cols-3 gap-8 mb-12">
+          {
+            related.map((item) => (
+              <a
+                href={`${prefix}/projects/${item.slug}`}
+                class="reveal group border border-gray-200 rounded-lg shadow-sm hover:shadow-md overflow-hidden bg-white transition-shadow"
+              >
+                <div class={`h-36 bg-gradient-to-br ${item.color} relative overflow-hidden`}>
+                  <img
+                    src={item.image}
+                    alt={item.title[locale]}
+                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    width="400"
+                    height="144"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="p-4">
+                  <h4 class="font-semibold text-gray-900 group-hover:text-gray-700">{item.title[locale]}</h4>
+                  <p class="text-sm text-gray-600 mt-1 line-clamp-2">{item.shortDescription[locale]}</p>
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      )
+    }
+
+    <div class="text-center reveal">
+      <a
+        href={`${prefix}/#projects`}
+        class="inline-flex items-center justify-center rounded-md bg-gray-900 hover:bg-gray-800 text-white font-semibold px-8 py-3 transition-colors"
+      >
+        {t.viewAllProjects}
+      </a>
+    </div>
+  </div>
+</section>

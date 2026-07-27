@@ -1,0 +1,139 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { projects } from "../../data/projects";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].projects;
+const prefix = `/${locale}`;
+---
+
+<section id="projects" class="py-20 px-4 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.title}</h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">{t.subtitle}</p>
+    </div>
+
+    <div id="projects-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+      {
+        projects.map((project, index) => (
+          <article
+            class:list={[
+              "group flex flex-col cursor-pointer reveal border border-gray-200 rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full bg-white",
+              index >= 3 && "project-card-hidden hidden",
+            ]}
+          >
+            <div class={`relative h-48 shrink-0 bg-gradient-to-br ${project.color} flex items-center justify-center overflow-hidden`}>
+              <img
+                src={project.image}
+                alt={`${project.title[locale]} - Project screenshot`}
+                class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-110 group-hover:rotate-[2deg] transition-transform duration-300"
+                width="400"
+                height="192"
+                loading="lazy"
+              />
+              <div class="absolute inset-0 bg-black/50 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <a
+                  href={project.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white text-gray-900 hover:bg-gray-100"
+                  aria-label="Demo"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                </a>
+                <a
+                  href={`${prefix}/projects/${project.slug}`}
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white text-gray-900 hover:bg-gray-100"
+                  aria-label={t.view}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <div class="p-6 pb-3 flex-1 flex flex-col min-h-0">
+              <h3 class="text-lg font-semibold text-gray-900 group-hover:text-gray-700 transition-colors line-clamp-2 min-h-[3.5rem]">
+                {project.title[locale]}
+              </h3>
+              <p class="text-gray-600 mt-1 line-clamp-3 min-h-[4.5rem]">
+                {project.shortDescription[locale]}
+              </p>
+            </div>
+
+            <div class="px-6 pb-6 mt-auto">
+              <div class="flex flex-wrap gap-2 mb-4 min-h-[3.5rem] content-start overflow-hidden">
+                {
+                  project.tags.slice(0, 4).map((tag) => (
+                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                      {tag}
+                    </span>
+                  ))
+                }
+                {
+                  project.tags.length > 4 && (
+                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                      +{project.tags.length - 4}
+                    </span>
+                  )
+                }
+              </div>
+
+              <div class="flex gap-2 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-opacity">
+                <a
+                  href={project.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group/demo flex-1 inline-flex items-center justify-center rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm font-medium hover:bg-gray-50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-0 w-0 opacity-0 overflow-hidden group-hover/demo:mr-1 group-hover/demo:w-3 group-hover/demo:opacity-100 transition-all duration-200" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
+                  {t.demo}
+                </a>
+                <a
+                  href={`${prefix}/projects/${project.slug}`}
+                  class="group/view flex-1 inline-flex items-center justify-center rounded-md bg-gray-900 hover:bg-gray-800 text-white px-3 py-2 text-sm font-medium"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-0 w-0 opacity-0 overflow-hidden group-hover/view:mr-1 group-hover/view:w-3 group-hover/view:opacity-100 transition-all duration-200" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  {t.view}
+                </a>
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    {
+      projects.length > 3 && (
+        <div class="text-center mt-12 reveal">
+          <button
+            id="show-more-projects"
+            type="button"
+            class="inline-flex items-center justify-center rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 font-semibold px-8 py-3 bg-transparent transition-colors"
+          >
+            {t.showMore}
+          </button>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  const btn = document.getElementById("show-more-projects");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const hidden = document.querySelectorAll(".project-card-hidden.hidden");
+      const batch = Array.from(hidden).slice(0, 3);
+      batch.forEach((el) => el.classList.remove("hidden"));
+      if (document.querySelectorAll(".project-card-hidden.hidden").length === 0) {
+        btn.classList.add("hidden");
+      }
+    });
+  }
+</script>

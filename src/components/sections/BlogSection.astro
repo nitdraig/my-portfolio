@@ -1,0 +1,90 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+
+interface BlogPost {
+  id: string;
+  title: string;
+  excerpt?: string;
+  category?: string;
+  readTime?: string;
+  image?: string;
+  date?: string;
+  url?: string;
+}
+
+interface Props {
+  locale: Locale;
+  posts: BlogPost[];
+}
+
+const { locale, posts } = Astro.props;
+const t = ui[locale].blog;
+---
+
+<section class="py-20 px-4 bg-gray-50" id="blogs">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.title}</h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">{t.subtitle}</p>
+    </div>
+
+    {
+      posts.length === 0 ? (
+        <p class="text-center text-gray-500 reveal">{t.empty}</p>
+      ) : (
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {
+            posts.slice(0, 3).map((post) => {
+              const postUrl =
+                post.url ??
+                `https://blog.agustin.top/posts/${post.id}?locale=${locale}`;
+              return (
+                <article class="reveal border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-2 transition-all duration-300 overflow-hidden group h-full bg-white">
+                  <div class="h-48 bg-gray-900 flex items-center justify-center relative overflow-hidden">
+                    <div class="text-center p-6">
+                      {post.category && (
+                        <span class="inline-flex items-center rounded-full bg-white/20 text-white border border-white/30 px-2.5 py-0.5 text-xs font-medium mb-3">
+                          {post.category}
+                        </span>
+                      )}
+                      <h3 class="text-lg font-bold leading-tight text-white">{post.title}</h3>
+                    </div>
+                  </div>
+                  <div class="p-6">
+                    <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
+                      {post.date && <span>{post.date}</span>}
+                      {post.readTime && <span>{post.readTime}</span>}
+                    </div>
+                    <p class="text-gray-600 text-lg line-clamp-3">{post.excerpt ?? post.title}</p>
+                    <a
+                      href={postUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center mt-4 text-gray-900 hover:text-gray-700 font-semibold group-hover:translate-x-1 transition-transform"
+                    >
+                      {t.readMore}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </a>
+                  </div>
+                </article>
+              );
+            })
+          }
+        </div>
+      )
+    }
+
+    <div class="text-center mt-12 reveal">
+      <a
+        href={`https://blog.agustin.top/posts?locale=${locale}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center justify-center rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 font-semibold px-8 py-3 bg-transparent transition-colors"
+      >
+        {t.viewAll}
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>

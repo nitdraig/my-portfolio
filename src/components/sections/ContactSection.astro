@@ -1,0 +1,227 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].contact;
+---
+
+<section id="contact" class="py-20 px-4 bg-gray-50">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.title}</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">{t.subtitle}</p>
+    </div>
+
+    <div class="reveal border border-gray-200 rounded-lg shadow-sm bg-white">
+      <div class="p-8">
+        <form id="contact-form" class="space-y-6 relative">
+          <div aria-hidden="true" class="sr-only-honeypot">
+            <label for="website">Website</label>
+            <input id="website" type="text" name="website" tabindex="-1" autocomplete="off" />
+            <label for="company">Company</label>
+            <input id="company" type="text" name="company" tabindex="-1" autocomplete="off" />
+          </div>
+          <input type="hidden" name="formOpenTimestamp" id="formOpenTimestamp" value="" />
+          <input type="hidden" name="language" value={locale} />
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="fullname" class="text-gray-900 font-medium">{t.fields.fullname}</label>
+              <input
+                type="text"
+                id="fullname"
+                name="fullname"
+                required
+                minlength="8"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+                placeholder={t.fields.fullnamePlaceholder}
+              />
+            </div>
+            <div class="space-y-2">
+              <label for="email" class="text-gray-900 font-medium">{t.fields.email}</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+                placeholder={t.fields.emailPlaceholder}
+              />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="necesidad" class="text-gray-900 font-medium">{t.fields.necesidad}</label>
+            <select
+              id="necesidad"
+              name="necesidad"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white"
+            >
+              {t.options.necesidad.map((o) => <option value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="presupuesto" class="text-gray-900 font-medium">{t.fields.presupuesto}</label>
+            <select
+              id="presupuesto"
+              name="presupuesto"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white"
+            >
+              {t.options.presupuesto.map((o) => <option value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="urgencia" class="text-gray-900 font-medium">{t.fields.urgencia}</label>
+            <select
+              id="urgencia"
+              name="urgencia"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white"
+            >
+              {t.options.urgencia.map((o) => <option value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="decision" class="text-gray-900 font-medium">{t.fields.decision}</label>
+            <select
+              id="decision"
+              name="decision"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white"
+            >
+              {t.options.decision.map((o) => <option value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="message" class="text-gray-900 font-medium">{t.fields.message}</label>
+            <textarea
+              id="message"
+              name="message"
+              rows={3}
+              class="w-full rounded-md border border-gray-300 px-3 py-2 min-h-[80px] focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              placeholder={t.fields.messagePlaceholder}
+            />
+          </div>
+
+          <div id="contact-error" class="hidden rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm" role="alert"></div>
+
+          <button
+            type="submit"
+            id="contact-submit"
+            class="w-full inline-flex items-center justify-center rounded-md bg-gray-900 text-white hover:bg-gray-800 font-semibold px-8 py-3 transition-colors disabled:opacity-60"
+          >
+            <span id="contact-submit-label">{t.submit}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<dialog id="contact-success-dialog" class="rounded-lg shadow-xl border border-gray-200 p-0 max-w-md w-[calc(100%-2rem)] backdrop:bg-black/50">
+  <div class="p-6 text-center">
+    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+    </div>
+    <h2 class="text-xl font-semibold text-gray-900 mb-2">{t.success.title}</h2>
+    <p class="text-base text-gray-600 mb-6">{t.success.description}</p>
+    <button type="button" id="contact-success-close" class="rounded-md bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 font-medium">
+      {t.success.close}
+    </button>
+  </div>
+</dialog>
+
+<script define:vars={{ locale, errors: t.errors, labels: { submit: t.submit, submitting: t.submitting } }}>
+  const form = document.getElementById("contact-form");
+  const timestampInput = document.getElementById("formOpenTimestamp");
+  const errorRegion = document.getElementById("contact-error");
+  const submitBtn = document.getElementById("contact-submit");
+  const submitLabel = document.getElementById("contact-submit-label");
+  const successDialog = document.getElementById("contact-success-dialog");
+  const successClose = document.getElementById("contact-success-close");
+
+  if (timestampInput) timestampInput.value = String(Date.now());
+
+  function showError(message) {
+    if (!errorRegion) return;
+    errorRegion.textContent = message;
+    errorRegion.classList.remove("hidden");
+  }
+
+  function hideError() {
+    errorRegion?.classList.add("hidden");
+  }
+
+  function mapError(code, message) {
+    switch (code) {
+      case "spam":
+        return errors.spam;
+      case "too_fast":
+        return errors.tooFast;
+      case "expired":
+        return errors.expired;
+      case "rate_limit":
+        return errors.rateLimit;
+      case "validation":
+        return message || errors.validation;
+      default:
+        return message || errors.send;
+    }
+  }
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideError();
+    if (submitBtn) submitBtn.disabled = true;
+    if (submitLabel) submitLabel.textContent = labels.submitting;
+
+    const fd = new FormData(form);
+    const payload = {
+      fullname: fd.get("fullname"),
+      email: fd.get("email"),
+      necesidad: fd.get("necesidad"),
+      presupuesto: fd.get("presupuesto"),
+      urgencia: fd.get("urgencia"),
+      decision: fd.get("decision"),
+      message: fd.get("message") || "",
+      language: locale,
+      honeypot: fd.get("website") || "",
+      honeypotCompany: fd.get("company") || "",
+      formOpenTimestamp: Number(fd.get("formOpenTimestamp")),
+    };
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+      if (result.success) {
+        form.reset();
+        if (timestampInput) timestampInput.value = String(Date.now());
+        successDialog?.showModal();
+      } else {
+        showError(mapError(result.error, result.message));
+      }
+    } catch {
+      showError(errors.send);
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+      if (submitLabel) submitLabel.textContent = labels.submit;
+    }
+  });
+
+  successClose?.addEventListener("click", () => successDialog?.close());
+  successDialog?.addEventListener("click", (e) => {
+    if (e.target === successDialog) successDialog.close();
+  });
+</script>

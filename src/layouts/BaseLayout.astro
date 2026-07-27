@@ -1,0 +1,92 @@
+---
+import "@fontsource/raleway/400.css";
+import "@fontsource/raleway/700.css";
+import "../styles/global.css";
+import type { Locale } from "../i18n/ui";
+import { getLocalizedPath } from "../i18n/utils";
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  description?: string;
+  image?: string;
+  canonicalPath?: string;
+}
+
+const {
+  locale,
+  title = "Agustín Avellaneda | AI-Powered Fullstack Developer & Project Manager",
+  description = "Desarrollador Fullstack especializado en IA y gestión de proyectos. Transformo ideas en productos exitosos usando tecnologías modernas.",
+  image = "https://www.agustin.top/og-image.webp",
+  canonicalPath = "",
+} = Astro.props;
+
+const site = Astro.site?.href?.replace(/\/$/, "") ?? "https://www.agustin.top";
+const canonical = `${site}${getLocalizedPath(locale, canonicalPath)}`;
+const altLocale = locale === "es" ? "en" : "es";
+/** Cache-bust so browsers drop a prior 404/empty favicon cache. */
+const faviconHref = "/favicon.ico?v=2";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      name: "Agustín Avellaneda",
+      url: site,
+      jobTitle: "AI-Powered Fullstack Developer & Project Manager",
+      sameAs: [
+        "https://github.com/nitdraig",
+        "https://www.linkedin.com/in/avellaneda-agustin/",
+      ],
+      email: "me@agustin.top",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Catamarca",
+        addressCountry: "AR",
+      },
+    },
+    {
+      "@type": "WebSite",
+      name: "Agustín Avellaneda Portfolio",
+      url: site,
+      inLanguage: [locale, altLocale],
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href={faviconHref} type="image/x-icon" sizes="any" />
+    <link rel="shortcut icon" href={faviconHref} type="image/x-icon" />
+    <link rel="apple-touch-icon" href={faviconHref} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={`${site}${getLocalizedPath("es", canonicalPath)}`} />
+    <link rel="alternate" hreflang="en" href={`${site}${getLocalizedPath("en", canonicalPath)}`} />
+    <link rel="alternate" hreflang="x-default" href={`${site}${getLocalizedPath("es", canonicalPath)}`} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta property="og:site_name" content="Agustín Avellaneda Portfolio" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body class="font-sans antialiased">
+    <slot />
+    <script>
+      import { initReveal } from "../scripts/reveal";
+      initReveal();
+    </script>
+  </body>
+</html>

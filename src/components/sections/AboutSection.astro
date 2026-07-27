@@ -1,0 +1,64 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].about;
+---
+
+<section id="about" class="py-20 px-4 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.title}</h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">{t.subtitle}</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <article class="reveal border border-gray-400 rounded-lg shadow-sm hover:shadow-md transition-shadow h-full bg-white">
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="p-2 bg-gray-100 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-700" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <h3 class="text-2xl font-semibold text-gray-900">{t.fullstack.title}</h3>
+          </div>
+          <p class="text-gray-600 text-base mb-4">{t.fullstack.description}</p>
+          <div class="flex flex-wrap gap-2">
+            {
+              t.fullstack.tags.map((tech) => (
+                <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-sm font-medium text-gray-700">
+                  {tech}
+                </span>
+              ))
+            }
+          </div>
+        </div>
+      </article>
+
+      <article class="reveal border border-gray-400 rounded-lg shadow-sm hover:shadow-md transition-shadow h-full bg-white">
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="p-2 bg-gray-100 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-700" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3 class="text-2xl font-semibold text-gray-900">{t.pm.title}</h3>
+          </div>
+          <p class="text-gray-600 text-base mb-4">{t.pm.description}</p>
+          <div class="flex flex-wrap gap-2">
+            {
+              t.pm.tags.map((skill) => (
+                <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-sm font-medium text-gray-700">
+                  {skill}
+                </span>
+              ))
+            }
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
