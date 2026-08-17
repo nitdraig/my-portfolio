@@ -1,6 +1,7 @@
 ---
 import type { Locale } from "../../i18n/ui";
 import { ui } from "../../i18n/ui";
+import { getTurnstileSiteKey } from "../../lib/contact/turnstile";
 
 interface Props {
   locale: Locale;
@@ -8,6 +9,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = ui[locale].contact;
+const turnstileSiteKey = getTurnstileSiteKey();
 ---
 
 <section id="contact" class="py-20 px-4 bg-gray-50">
@@ -26,7 +28,7 @@ const t = ui[locale].contact;
             <label for="company">Company</label>
             <input id="company" type="text" name="company" tabindex="-1" autocomplete="off" />
           </div>
-          <input type="hidden" name="formOpenTimestamp" id="formOpenTimestamp" value="" />
+          <input type="hidden" name="formToken" id="formToken" value="" />
           <input type="hidden" name="language" value={locale} />
 
           <div class="grid md:grid-cols-2 gap-6">
@@ -60,8 +62,10 @@ const t = ui[locale].contact;
             <select
               id="necesidad"
               name="necesidad"
+              required
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white"
             >
+              <option value="" disabled selected>{t.fields.selectPlaceholder}</option>
               {t.options.necesidad.map((o) => <option value={o.value}>{o.label}</option>)}
             </select>
           </div>
@@ -71,8 +75,10 @@ const t = ui[locale].contact;
             <select
               id="presupuesto"
               name="presupuesto"
+              required
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white"
             >
+              <option value="" disabled selected>{t.fields.selectPlaceholder}</option>
               {t.options.presupuesto.map((o) => <option value={o.value}>{o.label}</option>)}
             </select>
           </div>
@@ -82,8 +88,10 @@ const t = ui[locale].contact;
             <select
               id="urgencia"
               name="urgencia"
+              required
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white"
             >
+              <option value="" disabled selected>{t.fields.selectPlaceholder}</option>
               {t.options.urgencia.map((o) => <option value={o.value}>{o.label}</option>)}
             </select>
           </div>
@@ -93,8 +101,10 @@ const t = ui[locale].contact;
             <select
               id="decision"
               name="decision"
+              required
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white"
             >
+              <option value="" disabled selected>{t.fields.selectPlaceholder}</option>
               {t.options.decision.map((o) => <option value={o.value}>{o.label}</option>)}
             </select>
           </div>
@@ -109,6 +119,10 @@ const t = ui[locale].contact;
               placeholder={t.fields.messagePlaceholder}
             />
           </div>
+
+          {turnstileSiteKey && (
+            <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light"></div>
+          )}
 
           <div id="contact-error" class="hidden rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm" role="alert"></div>
 
@@ -139,16 +153,31 @@ const t = ui[locale].contact;
   </div>
 </dialog>
 
-<script define:vars={{ locale, errors: t.errors, labels: { submit: t.submit, submitting: t.submitting } }}>
+{turnstileSiteKey && (
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+)}
+
+<script define:vars={{ locale, errors: t.errors, labels: { submit: t.submit, submitting: t.submitting }, turnstileEnabled: Boolean(turnstileSiteKey) }}>
   const form = document.getElementById("contact-form");
-  const timestampInput = document.getElementById("formOpenTimestamp");
+  const tokenInput = document.getElementById("formToken");
   const errorRegion = document.getElementById("contact-error");
   const submitBtn = document.getElementById("contact-submit");
   const submitLabel = document.getElementById("contact-submit-label");
   const successDialog = document.getElementById("contact-success-dialog");
   const successClose = document.getElementById("contact-success-close");
 
-  if (timestampInput) timestampInput.value = String(Date.now());
+  async function refreshFormToken() {
+    if (!tokenInput) return;
+    try {
+      const res = await fetch("/api/contact-token", { method: "GET" });
+      const data = await res.json();
+      if (data.token) tokenInput.value = data.token;
+    } catch {
+      tokenInput.value = "";
+    }
+  }
+
+  refreshFormToken();
 
   function showError(message) {
     if (!errorRegion) return;
@@ -168,6 +197,8 @@ const t = ui[locale].contact;
         return errors.tooFast;
       case "expired":
         return errors.expired;
+      case "captcha":
+        return errors.captcha;
       case "rate_limit":
         return errors.rateLimit;
       case "validation":
@@ -177,9 +208,36 @@ const t = ui[locale].contact;
     }
   }
 
+  function getTurnstileToken() {
+    if (!turnstileEnabled) return "";
+    const input = form?.querySelector('[name="cf-turnstile-response"]');
+    if (input && input.value) return input.value;
+    if (window.turnstile) {
+      const widget = form?.querySelector(".cf-turnstile");
+      if (widget) return window.turnstile.getResponse(widget) || "";
+    }
+    return "";
+  }
+
+  function resetTurnstile() {
+    if (!turnstileEnabled || !window.turnstile) return;
+    const widget = form?.querySelector(".cf-turnstile");
+    if (widget) window.turnstile.reset(widget);
+  }
+
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     hideError();
+
+    if (!tokenInput?.value) {
+      await refreshFormToken();
+    }
+
+    if (turnstileEnabled && !getTurnstileToken()) {
+      showError(errors.captcha);
+      return;
+    }
+
     if (submitBtn) submitBtn.disabled = true;
     if (submitLabel) submitLabel.textContent = labels.submitting;
 
@@ -195,7 +253,8 @@ const t = ui[locale].contact;
       language: locale,
       honeypot: fd.get("website") || "",
       honeypotCompany: fd.get("company") || "",
-      formOpenTimestamp: Number(fd.get("formOpenTimestamp")),
+      formToken: fd.get("formToken") || "",
+      turnstileToken: getTurnstileToken(),
     };
 
     try {
@@ -207,13 +266,16 @@ const t = ui[locale].contact;
       const result = await res.json();
       if (result.success) {
         form.reset();
-        if (timestampInput) timestampInput.value = String(Date.now());
+        resetTurnstile();
+        refreshFormToken();
         successDialog?.showModal();
       } else {
         showError(mapError(result.error, result.message));
+        resetTurnstile();
       }
     } catch {
       showError(errors.send);
+      resetTurnstile();
     } finally {
       if (submitBtn) submitBtn.disabled = false;
       if (submitLabel) submitLabel.textContent = labels.submit;

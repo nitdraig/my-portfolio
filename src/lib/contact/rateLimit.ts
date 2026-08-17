@@ -2,8 +2,8 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { getEnv } from "../env";
 
-/** Production cap: enough for typos / retries, still blocks spam bursts. */
-const RATE_LIMIT_MAX = 10;
+/** Production cap: enough for a typo retry, tight enough to stop bursts. */
+const RATE_LIMIT_MAX = 3;
 const RATE_LIMIT_WINDOW = "1 h" as const;
 const RATE_LIMIT_PREFIX = "contact-form";
 

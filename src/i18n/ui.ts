@@ -159,6 +159,7 @@ export const ui = {
         decision: "¿Sos dueño o decisor del proyecto?",
         message: "Mensaje adicional (opcional, mín. 8 caracteres)",
         messagePlaceholder: "Algo más que quieras contar",
+        selectPlaceholder: "Selecciona una opción",
       },
       options: {
         necesidad: [
@@ -198,6 +199,7 @@ export const ui = {
         expired:
           "La sesión del formulario expiró. Recarga la página e intenta de nuevo.",
         rateLimit: "Demasiados envíos. Prueba dentro de una hora.",
+        captcha: "No pudimos verificar que seas una persona. Recarga e intenta de nuevo.",
         validation: "Revisa los campos.",
         send: "Error al enviar. Inténtalo más tarde.",
       },
@@ -396,6 +398,7 @@ export const ui = {
         decision: "Are you the project owner or decision maker?",
         message: "Additional message (optional, min. 8 characters)",
         messagePlaceholder: "Anything else you want to share",
+        selectPlaceholder: "Select an option",
       },
       options: {
         necesidad: [
@@ -433,6 +436,7 @@ export const ui = {
         tooFast: "Wait a few seconds after the form loads, then try again.",
         expired: "The form session expired. Reload the page and try again.",
         rateLimit: "Too many submissions. Try again in an hour.",
+        captcha: "We could not verify you are human. Reload and try again.",
         validation: "Check the fields.",
         send: "Error sending. Try again later.",
       },

@@ -4,7 +4,13 @@ import {
   formatDiscoveryBodyForOwner,
 } from "../../lib/contact/schema";
 import { validateAntiSpam } from "../../lib/contact/antiSpam";
+import { isSpamContent } from "../../lib/contact/contentFilter";
+import { isSameOriginRequest } from "../../lib/contact/origin";
 import { checkContactRateLimit } from "../../lib/contact/rateLimit";
+import {
+  isTurnstileConfigured,
+  verifyTurnstileToken,
+} from "../../lib/contact/turnstile";
 import { sendThankYouEmail } from "../../lib/email/sendThankYouEmail";
 import { getEnv } from "../../lib/env";
 
@@ -16,12 +22,18 @@ export type SubmitDiscoveryResult =
         | "spam"
         | "too_fast"
         | "expired"
+        | "captcha"
         | "rate_limit"
         | "validation"
         | "mailprex"
         | "email";
       message?: string;
     };
+
+/** Pretend success so bots do not iterate on the payload. */
+function silentReject(): Response {
+  return Response.json({ success: true } satisfies SubmitDiscoveryResult);
+}
 
 function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -49,19 +61,23 @@ export const POST: APIRoute = async ({ request }) => {
 
     const language = body.language === "en" ? "en" : "es";
 
-    const antiSpam = validateAntiSpam({
+    if (!isSameOriginRequest(request)) {
+      return silentReject();
+    }
+
+    const antiSpam = await validateAntiSpam({
       honeypot: typeof body.honeypot === "string" ? body.honeypot : undefined,
       honeypotCompany:
         typeof body.honeypotCompany === "string"
           ? body.honeypotCompany
           : undefined,
-      formOpenTimestamp:
-        typeof body.formOpenTimestamp === "number"
-          ? body.formOpenTimestamp
-          : Number(body.formOpenTimestamp),
+      formToken: typeof body.formToken === "string" ? body.formToken : undefined,
     });
 
     if (!antiSpam.ok) {
+      if (antiSpam.error === "spam") {
+        return silentReject();
+      }
       return Response.json(
         { success: false, error: antiSpam.error } satisfies SubmitDiscoveryResult,
         { status: 400 },
@@ -69,6 +85,19 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const ip = getClientIp(request);
+
+    if (isTurnstileConfigured()) {
+      const captchaToken =
+        typeof body.turnstileToken === "string" ? body.turnstileToken : "";
+      const captchaOk = await verifyTurnstileToken(captchaToken, ip);
+      if (!captchaOk) {
+        return Response.json(
+          { success: false, error: "captcha" } satisfies SubmitDiscoveryResult,
+          { status: 400 },
+        );
+      }
+    }
+
     const email = typeof body.email === "string" ? body.email : undefined;
     const allowed = await checkContactRateLimit(ip, email);
     if (!allowed) {
@@ -103,16 +132,21 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const data = parsed.data;
+
+    if (isSpamContent(data)) {
+      return silentReject();
+    }
+
     // Prefer Astro keys; fall back to Next.js naming for easier migration.
     const emailDestiny =
       getEnv("EMAIL_DESTINY") || getEnv("NEXT_PUBLIC_EMAIL_DESTINY");
-    const formToken =
+    const mailprexToken =
       getEnv("MAILPREX_FORM_TOKEN") ||
       getEnv("NEXT_PUBLIC_MAILPREX_FORM_TOKEN");
     const url =
       getEnv("MAILPREX_URL") || "https://api.mailprex.excelso.xyz/email/send";
 
-    if (!emailDestiny || !formToken) {
+    if (!emailDestiny || !mailprexToken) {
       console.error(
         "[contact] Missing EMAIL_DESTINY or MAILPREX_FORM_TOKEN in environment",
       );
@@ -140,7 +174,7 @@ export const POST: APIRoute = async ({ request }) => {
           phone: "",
           webName: "Portfolio Freelance Discovery",
           emailDestiny,
-          formToken,
+          formToken: mailprexToken,
         }),
       });
       if (!res.ok) {
