@@ -102,3 +102,12 @@ p {
   height: 1px;
   overflow: hidden;
 }
+
+/* Tailwind Preflight zeroes dialog margin; restore viewport centering. */
+dialog:modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  max-height: calc(100dvh - 2rem);
+}

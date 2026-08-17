@@ -171,7 +171,11 @@ const turnstileSiteKey = getTurnstileSiteKey();
     try {
       const res = await fetch("/api/contact-token", { method: "GET" });
       const data = await res.json();
-      if (data.token) tokenInput.value = data.token;
+      if (!res.ok || !data.token) {
+        tokenInput.value = "";
+        return;
+      }
+      tokenInput.value = data.token;
     } catch {
       tokenInput.value = "";
     }
@@ -231,6 +235,11 @@ const turnstileSiteKey = getTurnstileSiteKey();
 
     if (!tokenInput?.value) {
       await refreshFormToken();
+    }
+
+    if (!tokenInput?.value) {
+      showError(errors.send);
+      return;
     }
 
     if (turnstileEnabled && !getTurnstileToken()) {
