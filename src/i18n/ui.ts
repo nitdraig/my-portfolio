@@ -16,10 +16,9 @@ export const ui = {
     },
     hero: {
       name: "Agustin Avellaneda",
-      roleLead: "Semi-senior",
-      roleRest: "AI-Powered Fullstack Developer & PM",
+      role: "AI-Powered Fullstack Developer & PM",
       tagline:
-        "Transformo ideas en productos exitosos utilizando herramientas de IA avanzadas y metodologías probadas de gestión de proyectos.",
+        "Lanzo MVPs listos para el mercado en 4-6 semanas, con IA y gestión de punta a punta.",
       founderLine: "Fundador & CEO de ",
       excelso: "Excelso",
       stats: {
@@ -31,12 +30,12 @@ export const ui = {
       ctaProjects: "Ver mis trabajos",
       ctaContact: "Hablemos!",
       available: "Disponible",
-      techStack: "React • AI • Node.js",
+      techStack: "React • AI • Node.js • GO • Python • GO • Python",
     },
     about: {
       title: "Sobre Mí",
       subtitle:
-        "Transformo ideas en productos funcionales usando IA y gestiono todo el proceso de lanzamiento.",
+        "Más de 4 años construyendo productos digitales: desde startups early-stage hasta plataformas en producción con equipos reales.",
       fullstack: {
         title: "Desarrollo Fullstack",
         description:
@@ -53,7 +52,7 @@ export const ui = {
     services: {
       title: "Que Hago?",
       subtitle:
-        "Transformo ideas en productos funcionales usando IA, gestionando todo el proceso de lanzamiento.",
+        "Tres formas de trabajar juntos, según la etapa de tu negocio.",
       items: [
         {
           id: "ai-mvp",
@@ -76,12 +75,44 @@ export const ui = {
       ],
     },
     projects: {
-      title: "Proyectos Destacados",
+      title: "Casos de éxito",
       subtitle:
         "Algunos ejemplos de MVPs y productos que he desarrollado y lanzado.",
       showMore: "Ver Más",
       demo: "Demo",
       view: "Ver",
+      filters: {
+        deliveryLabel: "Tipo de entrega",
+        industryLabel: "Industria",
+        all: "Todos",
+        empty: "No hay proyectos con estos filtros.",
+        clear: "Limpiar filtros",
+        delivery: {
+          mvp: "MVP",
+          platform: "Plataforma / SaaS",
+          landing: "Landing",
+          internal: "App interna",
+        },
+        industry: {
+          healthcare: "Salud",
+          freelance: "Freelance / productividad",
+          management: "Gestión",
+          hackathons: "Hackathones",
+          sports: "Deportes",
+          education: "Educación",
+          mining: "Minería",
+          sustainability: "Sostenibilidad",
+          nonprofit: "ONG",
+          consulting: "Consultoría",
+          food: "Alimentación",
+          devtools: "Dev tools",
+          security: "Seguridad",
+          tech: "Tech / producto",
+        },
+        add: "Agregar filtro",
+        placeholder: "Filtrar por…",
+        remove: "Quitar filtro",
+      },
     },
     blog: {
       title: "Últimas Publicaciones",
@@ -113,6 +144,7 @@ export const ui = {
       prev: "Testimonio anterior",
       next: "Siguiente testimonio",
       goTo: "Ir al testimonio",
+      counter: "{current} / {total}",
       items: [
         {
           text: "Trabajar con Agustín es una de esas experiencias que confirman que el talento joven está más vivo que nunca. Lo conocí en una charla, le compartí una idea, y al toque estábamos trabajando juntos con una sintonía que no es fácil de lograr. Lo que más destaco no es solo su capacidad de materializar cualquier visión, sino el cuidado estético con el que lo hace: limpio, moderno, con criterio. A eso se suma una responsabilidad y compromiso que se notan en cada entrega.",
@@ -186,6 +218,14 @@ export const ui = {
       },
       submit: "Enviar solicitud",
       submitting: "Enviando...",
+      steps: {
+        progress: "Paso {current} de {total}",
+        next: "Siguiente",
+        back: "Atrás",
+        step1: "Tus datos",
+        step2: "Sobre tu proyecto",
+        step3: "Mensaje y envío",
+      },
       success: {
         title: "¡Solicitud enviada!",
         description:
@@ -255,10 +295,9 @@ export const ui = {
     },
     hero: {
       name: "Agustin Avellaneda",
-      roleLead: "Semi-senior",
-      roleRest: "AI-Powered Fullstack Developer & PM",
+      role: "AI-Powered Fullstack Developer & PM",
       tagline:
-        "I transform ideas into successful products using cutting-edge AI tools and proven project management methodologies.",
+        "I ship market-ready MVPs in 4–6 weeks, with AI and end-to-end product management.",
       founderLine: "Founder & CEO of ",
       excelso: "Excelso",
       stats: {
@@ -270,12 +309,12 @@ export const ui = {
       ctaProjects: "View My Works",
       ctaContact: "Let's talk!",
       available: "Available",
-      techStack: "React • AI • Node.js",
+      techStack: "React • AI • Node.js • GO • Python",
     },
     about: {
       title: "About Me",
       subtitle:
-        "I transform ideas into functional products using AI and manage the entire launch process.",
+        "4+ years building digital products—from early-stage startups to production platforms with real teams.",
       fullstack: {
         title: "Fullstack Development",
         description:
@@ -291,8 +330,7 @@ export const ui = {
     },
     services: {
       title: "What I Do?",
-      subtitle:
-        "I transform ideas into functional products using AI and manage the entire launch process.",
+      subtitle: "Three ways to work together, matched to your business stage.",
       items: [
         {
           id: "ai-mvp",
@@ -315,12 +353,44 @@ export const ui = {
       ],
     },
     projects: {
-      title: "Featured Projects",
+      title: "Success Cases",
       subtitle:
         "Some examples of MVPs and products I have developed and launched.",
       showMore: "See More",
       demo: "Demo",
       view: "View",
+      filters: {
+        deliveryLabel: "Delivery type",
+        industryLabel: "Industry",
+        all: "All",
+        empty: "No projects match these filters.",
+        clear: "Clear filters",
+        delivery: {
+          mvp: "MVP",
+          platform: "Platform / SaaS",
+          landing: "Landing",
+          internal: "Internal app",
+        },
+        industry: {
+          healthcare: "Healthcare",
+          freelance: "Freelance / productivity",
+          management: "Management",
+          hackathons: "Hackathons",
+          sports: "Sports",
+          education: "Education",
+          mining: "Mining",
+          sustainability: "Sustainability",
+          nonprofit: "Nonprofit",
+          consulting: "Consulting",
+          food: "Food",
+          devtools: "Dev tools",
+          security: "Security",
+          tech: "Tech / product",
+        },
+        add: "Add filter",
+        placeholder: "Filter by…",
+        remove: "Remove filter",
+      },
     },
     blog: {
       title: "Latest Blog Posts",
@@ -352,6 +422,7 @@ export const ui = {
       prev: "Previous testimonial",
       next: "Next testimonial",
       goTo: "Go to testimonial",
+      counter: "{current} / {total}",
       items: [
         {
           text: "Working with Agustín is one of those experiences that confirm that young talent is more alive than ever. I met him at a talk, I shared an idea with him, and soon we were working together with a harmony that is not easy to achieve. What stands out the most is not only his ability to materialize any vision, but the aesthetic care with which it is done: clean, modern, with criteria.Added to this is a responsibility and commitment that is evident in each delivery.",
@@ -425,6 +496,14 @@ export const ui = {
       },
       submit: "Submit request",
       submitting: "Sending...",
+      steps: {
+        progress: "Step {current} of {total}",
+        next: "Next",
+        back: "Back",
+        step1: "Your details",
+        step2: "About your project",
+        step3: "Message & submit",
+      },
       success: {
         title: "Request sent!",
         description:

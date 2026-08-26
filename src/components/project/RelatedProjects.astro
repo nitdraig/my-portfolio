@@ -1,10 +1,7 @@
 ---
 import type { Locale } from "../../i18n/ui";
 import { ui } from "../../i18n/ui";
-import { projects } from "../../data/projects";
-import type { projects as projectsData } from "../../data/projects";
-
-type Project = (typeof projectsData)[number];
+import { projects, type Project } from "../../data/projects";
 
 interface Props {
   locale: Locale;
@@ -14,7 +11,18 @@ interface Props {
 const { locale, project } = Astro.props;
 const t = ui[locale].projectDetail;
 const prefix = `/${locale}`;
-const related = projects.filter((p) => p.slug !== project.slug).slice(0, 3);
+const related = projects
+  .filter((p) => p.slug !== project.slug)
+  .sort((a, b) => {
+    const aScore =
+      (a.industry === project.industry ? 2 : 0) +
+      (a.deliveryType === project.deliveryType ? 1 : 0);
+    const bScore =
+      (b.industry === project.industry ? 2 : 0) +
+      (b.deliveryType === project.deliveryType ? 1 : 0);
+    return bScore - aScore;
+  })
+  .slice(0, 3);
 ---
 
 <section class="py-20 px-4 bg-gray-50">

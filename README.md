@@ -48,6 +48,8 @@ npm run check
 | `MAILER_PORT` | No | SMTP port (default `587`) |
 | `MAILER_USER` | Yes (contact) | SMTP username |
 | `MAILER_PASS` | Yes (contact) | SMTP password |
+| `PUBLIC_TURNSTILE_SITE_KEY` | Recommended | Cloudflare Turnstile site key (public, needed at build) |
+| `TURNSTILE_SECRET_KEY` | Recommended | Cloudflare Turnstile secret (server verify) |
 | `UPSTASH_REDIS_REST_URL` | Recommended | Upstash Redis URL for rate limiting |
 | `UPSTASH_REDIS_REST_TOKEN` | Recommended | Upstash Redis token |
 
