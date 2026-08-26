@@ -2,12 +2,31 @@ import { getEnv } from "../env";
 
 const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
+/** Treat empty or .env.example placeholders as unset. */
+function isPlaceholder(value: string): boolean {
+  const v = value.trim().toLowerCase();
+  if (!v) return true;
+  return (
+    v.startsWith("your-") ||
+    v.includes("your-turnstile") ||
+    v === "changeme"
+  );
+}
+
+/** Public site key — safe to embed in prerendered HTML. */
 export function getTurnstileSiteKey(): string {
-  return getEnv("PUBLIC_TURNSTILE_SITE_KEY");
+  // Prefer static PUBLIC_ read so Vite inlines it at build/prerender time.
+  const fromMeta = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+  const raw =
+    fromMeta != null && String(fromMeta).trim() !== ""
+      ? String(fromMeta).trim()
+      : getEnv("PUBLIC_TURNSTILE_SITE_KEY");
+  return isPlaceholder(raw) ? "" : raw;
 }
 
 function getTurnstileSecret(): string {
-  return getEnv("TURNSTILE_SECRET_KEY");
+  const raw = getEnv("TURNSTILE_SECRET_KEY");
+  return isPlaceholder(raw) ? "" : raw;
 }
 
 export function isTurnstileConfigured(): boolean {

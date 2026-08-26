@@ -1,4 +1,161 @@
-export const projects = [
+import type { DeliveryType, Industry } from "./projectTaxonomy";
+
+export type Project = {
+  slug: string;
+  title: { en: string; es: string };
+  shortDescription: { en: string; es: string };
+  description: { en: string; es: string };
+  year?: number;
+  color: string;
+  tags: string[];
+  image: string;
+  demoUrl: string;
+  githubUrl?: string;
+  challenge?: { en: string; es: string };
+  solution?: { en: string; es: string };
+  results?: { en: string[]; es: string[] };
+  highlightMetric?: { en: string; es: string };
+  homeOrder?: number;
+  featured?: boolean;
+  status: string;
+  deliveryType: DeliveryType;
+  industry: Industry;
+};
+
+export const projects: Project[] = [
+  {
+    slug: "encrypt-d",
+    title: {
+      en: "Encrypt-D",
+      es: "Encrypt-D",
+    },
+    shortDescription: {
+      en: "Military-grade security. Human-level simplicity. AES-256-GCM folder encryption for Windows.",
+      es: "Seguridad de grado militar. Simplicidad humana. Cifrado de carpetas AES-256-GCM para Windows.",
+    },
+    description: {
+      en: "Encrypt-D is a professional folder encryption manager for Windows that combines AES-256-GCM military-grade encryption with an intuitive interface—hidden folders, strong password rules, and configurable brute-force protection. MIT-licensed, Python 3.8+, part of Excelso Open (security division of Excelso Tech Group). Excelso drives innovation, digitalization, and sustainability with a client-centered motto: “We fix it thinking of you. We are solutions. We are Excelso.”",
+      es: "Encrypt-D es un gestor profesional de cifrado de carpetas para Windows que combina AES-256-GCM de grado militar con una interfaz intuitiva: carpetas ocultas, contraseñas fuertes y protección configurable ante fuerza bruta. Licencia MIT, Python 3.8+, parte de Excelso Open (división de seguridad del Excelso Tech Group). Excelso impulsa innovación, digitalización y sostenibilidad con un lema centrado en el cliente: “Lo arreglamos pensando en vos. Somos soluciones. Somos Excelso.”",
+    },
+    year: 2026,
+    color: "from-emerald-800 to-slate-950",
+    tags: [
+      "Open Source",
+      "AES-256-GCM",
+      "Python",
+      "Windows",
+      "Security",
+      "Excelso Open",
+      "MIT",
+    ],
+    image: "/project-images/encrypt-d.webp",
+    demoUrl: "https://encrypt-d.excelso.xyz",
+    githubUrl: "https://github.com/nitdraig/encrypt-d",
+    challenge: {
+      en: "Sensitive local folders need real cryptographic protection without cloud lock-in or opaque closed tools. Windows users wanted military-grade encryption with a simple UI, auditable open source code, and optional auto-destruction against brute force.",
+      es: "Las carpetas locales sensibles necesitan protección criptográfica real sin dependencia de la nube ni herramientas cerradas opacas. Los usuarios de Windows querían cifrado de grado militar con UI simple, código open source auditable y auto-destrucción opcional ante fuerza bruta.",
+    },
+    solution: {
+      en: "Built Encrypt-D as a Windows desktop manager with AES-256-GCM, unique salt/nonce per folder and file, PBKDF2-SHA256 (100k iterations), HIDDEN+SYSTEM folder attributes, responsive UI, and configurable failed-attempt limits (1–10 or unlimited). Screaming Architecture for maintainability; shipped under Excelso Open with MIT license.",
+      es: "Construí Encrypt-D como gestor de escritorio Windows con AES-256-GCM, salt/nonce únicos por carpeta y archivo, PBKDF2-SHA256 (100k iteraciones), atributos HIDDEN+SYSTEM, UI responsive y límite configurable de intentos fallidos (1–10 o ilimitado). Arquitectura Screaming para mantenibilidad; publicado bajo Excelso Open con licencia MIT.",
+    },
+    results: {
+      es: [
+        "Cifrado AES-256-GCM de grado militar",
+        "Protección configurable ante fuerza bruta (v1.1)",
+        "Carpetas ocultas en el Explorador de Windows",
+        "UI responsive y requisitos fuertes de contraseña",
+        "Código open source auditable (MIT)",
+        "Parte de Excelso Open — división de seguridad",
+        "Sitio y descargas en encrypt-d.excelso.xyz",
+      ],
+      en: [
+        "Military-grade AES-256-GCM encryption",
+        "Configurable brute-force protection (v1.1)",
+        "Folders hidden from Windows Explorer",
+        "Responsive UI and strong password requirements",
+        "Auditable open-source code (MIT)",
+        "Part of Excelso Open — security division",
+        "Site and downloads at encrypt-d.excelso.xyz",
+      ],
+    },
+    highlightMetric: {
+      es: "AES-256-GCM con UI simple para Windows",
+      en: "AES-256-GCM with a simple Windows UI",
+    },
+    homeOrder: 5,
+    featured: true,
+    deliveryType: "platform",
+    industry: "security",
+    status: "active",
+  },
+  {
+    slug: "lexis-two",
+    title: {
+      en: "Lexis-Two",
+      es: "Lexis-Two",
+    },
+    shortDescription: {
+      en: "The simple way to obtain the best code. Portable rules, skills, and slash commands.",
+      es: "La forma simple de obtener el mejor código. Reglas, skills y slash commands portables.",
+    },
+    description: {
+      en: "Lexis-Two is an open-source toolkit of portable rules, skills, and slash commands grounded in YAGNI, KISS, DRY, and SOLID—multi-agent workflows, one skills/ source, thin host adapters. It is the public layer of Lexis, a multi-agent ecosystem for shipping production web apps with engineering discipline rather than prompt theater: specialized agents for planning, implementation, review, refactor, and security share one ruleset. Part of Excelso Open, Excelso’s open-source and community branch focused on collaborative technology and social impact (excelso.xyz).",
+      es: "Lexis-Two es un toolkit open source de reglas, skills y slash commands portables, anclado en YAGNI, KISS, DRY y SOLID: flujos multi-agente, una sola fuente skills/ y adapters delgados por host. Es la capa pública de Lexis, un ecosistema multi-agente para entregar apps web en producción con disciplina de ingeniería, no teatro de prompts: agentes especializados en planning, implementación, review, refactor y seguridad comparten un solo ruleset. Forma parte de Excelso Open, la rama open source y comunitaria de Excelso orientada a tecnología colaborativa e impacto social (excelso.xyz).",
+    },
+    year: 2026,
+    color: "from-neutral-800 to-neutral-950",
+    tags: [
+      "Open Source",
+      "AI Agents",
+      "OpenCode",
+      "Cursor",
+      "YAGNI",
+      "TypeScript",
+      "Excelso Open",
+      "npm",
+    ],
+    image: "/project-images/lexis-two.png",
+    demoUrl: "https://lexis-two.excelso.xyz",
+    githubUrl: "https://github.com/nitdraig/lexis-two",
+    challenge: {
+      en: "Most AI coding setups optimize for verbose output and speculative abstractions. Teams needed a portable ruleset and multi-host skills catalog that enforce engineering discipline—prove the feature belongs, prefer stack-native solutions, and ship the minimum that holds—without locking into a single IDE.",
+      es: "La mayoría de setups de coding con IA priorizan output verboso y abstracciones especulativas. Los equipos necesitaban un ruleset portable y un catálogo de skills multi-host que impongan disciplina de ingeniería—probar que el feature corresponde, preferir lo nativo del stack y entregar el mínimo que se sostiene—sin atarse a un solo IDE.",
+    },
+    solution: {
+      en: "Published Lexis-Two as MIT open source under Excelso Open: AGENTS.md decision ladder, OpenCode plugin with lite/full/ultra modes, unified /lexis and /specxis commands, and thin adapters for Cursor, Windsurf, Cline, Copilot, Gemini CLI, and more. One skills/ source; slash commands route instead of forking logic. Install via npx @draig/lexis-two install.",
+      es: "Publicamos Lexis-Two como open source MIT bajo Excelso Open: escalera de decisión en AGENTS.md, plugin de OpenCode con modos lite/full/ultra, comandos unificados /lexis y /specxis, y adapters delgados para Cursor, Windsurf, Cline, Copilot, Gemini CLI y más. Una sola fuente skills/; los slash commands enrutan en lugar de duplicar lógica. Instalación con npx @draig/lexis-two install.",
+    },
+    results: {
+      es: [
+        "Ecosistema portable de reglas, skills y slash commands",
+        "Instalador multi-host: npx @draig/lexis-two install",
+        "Agentes especializados: coding, review, UI, refactor, security, explorer",
+        "Specxis: capa SDD ligera para features complejas",
+        "Ejemplos before/after en Next.js, Express y FastAPI",
+        "Parte de Excelso Open y del ecosistema Lexis",
+        "Licencia MIT y sitio en lexis-two.excelso.xyz",
+      ],
+      en: [
+        "Portable ecosystem of rules, skills, and slash commands",
+        "Multi-host installer: npx @draig/lexis-two install",
+        "Specialized agents: coding, review, UI, refactor, security, explorer",
+        "Specxis: lightweight SDD layer for complex features",
+        "Before/after examples across Next.js, Express, and FastAPI",
+        "Part of Excelso Open and the Lexis ecosystem",
+        "MIT license and site at lexis-two.excelso.xyz",
+      ],
+    },
+    highlightMetric: {
+      es: "Open source: disciplina antes que theater de prompts",
+      en: "Open source: discipline over prompt theater",
+    },
+    homeOrder: 4,
+    featured: true,
+    deliveryType: "platform",
+    industry: "devtools",
+    status: "active",
+  },
   {
     slug: "flowfolio",
     title: {
@@ -13,7 +170,7 @@ export const projects = [
       en: "Flowfolio solves the typical chaos of freelance work: scattered emails, disorganized files, manual updates, and duplicated communication. With Flowfolio, each client has their own mini-dashboard where they can track progress, approve tasks, and communicate. The integrated AI automates repetitive tasks like summaries, frequently asked questions, and task generation from briefs.",
       es: "Flowfolio resuelve el caos típico del trabajo freelance: emails sueltos, archivos dispersos, actualizaciones manuales y comunicación duplicada. Con Flowfolio, cada cliente tiene su propio mini-dashboard donde puede seguir el progreso, aprobar tareas y comunicarse. La IA integrada automatiza tareas repetitivas como resúmenes, respuestas frecuentes y generación de tareas desde briefs.",
     },
-    year: 2026,
+    year: 2026,
     color: "from-blue-600 to-blue-800",
     tags: [
       "Next.js",
@@ -70,7 +227,14 @@ export const projects = [
         "Production-ready deployment (Docker Compose, Vercel)",
       ],
     },
+    highlightMetric: {
+      es: "Centro de comando freelance con IA integrada",
+      en: "AI-powered command center for freelancers",
+    },
+    homeOrder: 3,
     featured: true,
+    deliveryType: "platform",
+    industry: "management",
     status: "active",
   },
   {
@@ -87,7 +251,7 @@ export const projects = [
       en: "Platform built for the EXPERIMENTAL Global team to streamline communication, coordination, direction, and review of hackathon challenges. It connects organizations with real challenges and global talent to design, execute, and validate technology solutions—validated projects can receive compensation or be spun out as startups. I delivered the bilingual marketing landing (Astro 6, Tailwind CSS v4) and the production web app (Next.js 16, Express, MongoDB) with role-based dashboards, challenge lifecycle, teams, submissions, mentor scoring, and admin analytics.",
       es: "Plataforma diseñada para el equipo de EXPERIMENTAL Global con el fin de facilitar la comunicación, el orden, la dirección y la revisión de desafíos de hackathon. Conecta organizaciones con retos reales y talento global para diseñar, ejecutar y validar soluciones tecnológicas; los proyectos validados acceden a compensación o se constituyen como startups. Desarrollé el landing bilingüe (Astro 6, Tailwind CSS v4) y la aplicación en producción (Next.js 16, Express, MongoDB) con dashboards por rol, ciclo de vida de retos, equipos, entregas, evaluación por mentores y analíticas de administración.",
     },
-    year: 2026,
+    year: 2026,
     color: "from-indigo-600 to-violet-800",
     tags: [
       "Astro",
@@ -130,7 +294,13 @@ export const projects = [
         "Production-ready deployment (Docker Compose, Vercel)",
       ],
     },
+    highlightMetric: {
+      es: "6 roles con dashboards y ciclo completo de retos",
+      en: "6 role dashboards with full challenge lifecycle",
+    },
     featured: true,
+    deliveryType: "platform",
+    industry: "hackathons",
     status: "active",
   },
   {
@@ -147,7 +317,7 @@ export const projects = [
       en: "A strategic co-founded project designed to centralize race logistics. I lead the technical architecture and development of the MVP, creating a platform where runners can find events, coordinate shared transportation, and manage lodging in a social, community-driven environment.",
       es: "Un proyecto de co-fundación estratégica diseñado para centralizar la logística de carreras. Lidero la arquitectura técnica y el desarrollo del MVP, creando una plataforma donde los corredores pueden encontrar eventos, coordinar transporte compartido y gestionar alojamiento en un entorno social impulsado por la comunidad.",
     },
-    year: 2026,
+    year: 2026,
     color: "from-red-500 to-red-700",
     tags: [
       "React",
@@ -187,7 +357,13 @@ export const projects = [
         "Scalable architecture based on TypeScript and Node.js",
       ],
     },
+    highlightMetric: {
+      es: "MVP de logística colaborativa en 90 días",
+      en: "Collaborative logistics MVP in 90 days",
+    },
     featured: true,
+    deliveryType: "mvp",
+    industry: "sports",
     status: "active",
   },
   {
@@ -204,7 +380,7 @@ export const projects = [
       en: "A comprehensive medical blog and knowledge platform for Around Notes, designed to educate healthcare professionals and share insights about AI in medicine. I developed the complete blog architecture, content management system, and user experience, focusing on accessibility, SEO optimization, and medical content presentation standards.",
       es: "Un blog médico integral y plataforma de conocimiento para Around Notes, diseñado para educar a profesionales de la salud y compartir conocimientos sobre IA en medicina. Desarrollé la arquitectura completa del blog, sistema de gestión de contenido, y experiencia de usuario, enfocándome en accesibilidad, optimización SEO, y estándares de presentación de contenido médico.",
     },
-    year: 2025,
+    year: 2025,
     color: "from-blue-600 to-blue-800",
     tags: ["Next.js", "MDX", "SEO", "Content Management", "Healthcare", "Blog"],
     image: "/project-images/aroundnotes-blog-image.webp",
@@ -237,6 +413,8 @@ export const projects = [
       ],
     },
     featured: false,
+    deliveryType: "platform",
+    industry: "healthcare",
     status: "active",
   },
   {
@@ -253,7 +431,7 @@ export const projects = [
       en: "Around Notes is a HIPAA-safe, browser-based AI platform built by physicians for inpatient medicine. It generates quality medical notes, provides access to PHI secure AI models, and streamlines clinical workflows. As part of the development team, I contributed to frontend development focusing on UX/UI, performance optimization, and key integrations including dashboard, note modules, EKG and radiology modules, and user management systems.",
       es: "Around Notes es una plataforma de IA segura HIPAA, basada en navegador, construida por médicos para medicina hospitalaria. Genera notas médicas de calidad, proporciona acceso a modelos de IA seguros para PHI, y optimiza los flujos de trabajo clínicos. Como parte del equipo de desarrollo, contribuí al desarrollo frontend enfocándome en UX/UI, optimización de rendimiento, e integraciones clave incluyendo dashboard, módulos de notas, módulos de EKG y radiología, y sistemas de gestión de usuarios.",
     },
-    year: 2025,
+    year: 2025,
     color: "from-purple-800 to-purple-900",
     tags: ["React", "TypeScript", "UX/UI", "Performance", "Healthcare", "AI"],
     image: "/project-images/aroundnotes-app-image.webp",
@@ -285,7 +463,14 @@ export const projects = [
         "Modular and scalable architecture",
       ],
     },
+    highlightMetric: {
+      es: "IA clínica con cumplimiento HIPAA",
+      en: "HIPAA-compliant clinical AI platform",
+    },
+    homeOrder: 1,
     featured: true,
+    deliveryType: "platform",
+    industry: "healthcare",
     status: "active",
   },
   {
@@ -302,7 +487,7 @@ export const projects = [
       en: "A landing page for the app 'Around Notes', provides a platform for users to create and manage medical notes. The application features a modern design and utilizes various technologies to provide a seamless user experience.",
       es: "Una Landing page para la aplicación 'Around Notes', a una plataforma para que usuarios médicos creen y administren notas médicas. La aplicación presenta un diseño moderno y utiliza varias tecnologías para proporcionar una experiencia de usuario perfecta.",
     },
-    year: 2025,
+    year: 2025,
     color: "from-purple-300 to-purple-500",
     tags: ["Astro", "Tailwind", "SEO", "Performance"],
     image: "/project-images/aroundnotes-landing-image.webp",
@@ -331,6 +516,8 @@ export const projects = [
       ],
     },
     featured: true,
+    deliveryType: "landing",
+    industry: "healthcare",
     status: "active",
   },
   {
@@ -346,7 +533,7 @@ export const projects = [
     description: {
       en: "Web platform developed for management of institutions, teachers, and students focused on public schools, private and university education. It is part of a larger ecosystem that seeks to facilitate the integration of talents into modernity.",
       es: "Plataforma web desarrollada para gestión de instituciones, profesores, y alumnos enfocado en escuelas públicas, privadas de educación secundaria y universitaria. Forma parte de un ecosistema más grande que busca facilitar la integración de los talentos a la modernidad. ",
-    },
+    },
     color: "from-blue-700 to-gray-600",
     tags: ["Next.js", "Tailwind", "TypeScript", "Express", "MongoDB"],
     image: "/project-images/sigii-image.png",
@@ -375,8 +562,15 @@ export const projects = [
         "Scalability",
       ],
     },
-    featured: false,
+    highlightMetric: {
+      es: "MVP institucional completo en 4 semanas",
+      en: "Full institutional MVP in 4 weeks",
+    },
+    homeOrder: 2,
+    featured: true,
     year: 2024,
+    deliveryType: "mvp",
+    industry: "education",
     status: "active",
   },
   {
@@ -393,7 +587,7 @@ export const projects = [
       en: "Connects mining companies with talent. Uses AI to match profiles with job offers.",
       es: "Conecta empresas mineras con talento. Usa IA para emparejar perfiles con ofertas laborales.",
     },
-    year: 2025,
+    year: 2025,
     color: "from-yellow-600 to-yellow-800",
     tags: ["Next.js", "Express.js", "TypeScript", "Cloudinary"],
     image: "/project-images/mtn-image.png",
@@ -422,6 +616,8 @@ export const projects = [
       ],
     },
     featured: true,
+    deliveryType: "mvp",
+    industry: "mining",
     status: "active",
   },
   {
@@ -437,7 +633,7 @@ export const projects = [
     description: {
       en: "Tech collective focused on digital solutions, sustainability and innovation.",
       es: "Colectivo tecnológico enfocado en soluciones digitales, sostenibilidad e innovación.",
-    },
+    },
     color: "from-sky-600 to-sky-800",
     tags: ["Next.js", "TypeScript", "Tailwind", "Node.js"],
     image: "/project-images/excelso-image.png",
@@ -445,6 +641,8 @@ export const projects = [
     githubUrl: "https://github.com/excelso-tech",
     featured: true,
     year: 2025,
+    deliveryType: "landing",
+    industry: "tech",
     status: "active",
   },
   {
@@ -460,7 +658,7 @@ export const projects = [
     description: {
       en: "AI agent for promoting sustainability and transparency in extractive industries.",
       es: "Agente IA que promueve sostenibilidad y transparencia en industrias extractivas.",
-    },
+    },
     color: "from-green-600 to-green-800",
     tags: ["Next.js", "TypeScript", "IA", "Cloudinary"],
     image: "/project-images/jema-image.png",
@@ -488,6 +686,8 @@ export const projects = [
 
     featured: true,
     year: 2025,
+    deliveryType: "platform",
+    industry: "sustainability",
     status: "active",
   },
   {
@@ -503,7 +703,7 @@ export const projects = [
     description: {
       en: "Website for an NGO rescuing street animals. Led product and project management.",
       es: "Sitio web para ONG de rescate animal. Lideré gestión de producto y proyecto.",
-    },
+    },
     color: "from-pink-600 to-pink-800",
     tags: ["Next.js", "Strapi", "Tailwind", "TypeScript"],
     image: "/project-images/huellitas-image.png",
@@ -533,6 +733,8 @@ export const projects = [
     },
     featured: false,
     year: 2024,
+    deliveryType: "platform",
+    industry: "nonprofit",
     status: "active",
   },
   {
@@ -548,7 +750,7 @@ export const projects = [
     description: {
       en: "A personalized website and with an exclusive design, focused on the consultant, their needs and along with the client's criteria. It is a freelance job. In addition to programming and design, I collaborated in the creation of social networks, logos, online presence, page maintenance, domain and optimization of SEO.",
       es: "Una web personalizada y con un diseño exclusivo, enfocado en la consultora, sus necesidades y a la par de los criterios del cliente. Es un trabajo freelance. Además de la programación y diseño, colaboré en la creación de las redes sociales, logos, presencia en línea, mantenimiento de la página, dominio y optimización de SEO.",
-    },
+    },
     color: "from-indigo-600 to-indigo-800",
     tags: ["Nextjs", "Tailwind", "Typescript"],
     image: "/project-images/dc-image.png",
@@ -577,6 +779,8 @@ export const projects = [
       ],
     },
     year: 2024,
+    deliveryType: "landing",
+    industry: "mining",
     status: "active",
   },
   {
@@ -592,7 +796,7 @@ export const projects = [
     description: {
       en: "Web and Mobile application that makes use of artificial intelligence, designed to offer personalized recommendations of healthy and accessible recipes, ask you to enter your ingredients you have at home. Based on these criteria, the website analyzes the user's needs and suggests recipe options, taking into account factors such as diseases, allergies, and food preferences.",
       es: "Aplicación web y mobile que hace uso de inteligencia artificial, diseñada para ofrecer recomendaciones personalizadas de recetas saludables y accesibles, te solicita ingresar tus ingredientes que tengas en casa. Basado en esos criterios, la web analiza las necesidades del usuario y sugiere opciones de recetas, teniendo en cuenta factores como enfermedades, alergias, y preferencias alimenticias.",
-    },
+    },
     color: "from-gray-600 to-gray-800",
     tags: ["Next.js", "Tailwind", "TypeScript"],
     image: "/project-images/fuddy-app-image.png",
@@ -621,6 +825,8 @@ export const projects = [
     },
     featured: false,
     year: 2024,
+    deliveryType: "mvp",
+    industry: "food",
     status: "active",
   },
   {
@@ -636,7 +842,7 @@ export const projects = [
     description: {
       en: "Mailprex is a web platform designed to simplify the process of sending forms from websites to emails. You can easily integrate a React Hook into your project, to which you pass the minimum data that allow the shipping and content of the form to reach your chosen email without major inconveniences.",
       es: "Mailprex es una plataforma web diseñada para simplificar el proceso de envío de formularios desde sitios web a correos electrónicos. Puedes integrar fácilmente un React Hook a tu proyecto, al cual le pasas los datos mínimos que permiten el envío y el contenido del formulario llega a tu correo elegido sin mayores inconvenientes.",
-    },
+    },
     color: "from-blue-600 to-blue-800",
     tags: ["Next.js", "Express.js", "Node.js", "Tailwind", "TypeScript"],
     image: "/project-images/mailprex-app.png",
@@ -666,6 +872,8 @@ export const projects = [
     },
     featured: false,
     year: 2024,
+    deliveryType: "platform",
+    industry: "devtools",
     status: "active",
   },
 ];
