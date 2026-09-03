@@ -1,5 +1,64 @@
 export const projects = [
   {
+    slug: "ate",
+    title: {
+      en: "ATE — Membership Management Platform",
+      es: "ATE — Plataforma de gestión de socios",
+    },
+    shortDescription: {
+      en: "Full-stack web app for managing association memberships: installment payment plans, QR access control, and a complete admin panel.",
+      es: "Aplicación web full-stack para la administración integral de membresías: planes de pago por cuotas, control de accesos con QR y panel administrativo completo.",
+    },
+    description: {
+      en: "Internal system used by members, access staff, and administrators. Members manage their membership from a mobile-first personal profile; administrators review payments, manage users, and configure business rules from a desktop panel.",
+      es: "Sistema interno usado por socios, personal de acceso y administradores. Los socios gestionan su membresía desde un perfil personal (mobile-first); los administradores revisan pagos, gestionan usuarios y configuran reglas de negocio desde un panel desktop.",
+    },
+    year: 2026,
+    color: "from-emerald-600 to-teal-800",
+    tags: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Express",
+      "MongoDB",
+      "Socket.IO",
+      "Dropbox API",
+    ],
+    image: "/project-images/clubate.webp",
+    demoUrl: "https://clubate.com.ar",
+    challenge: {
+      es: "Construir un sistema integral de gestión de membresías que sirva a tres perfiles distintos (socios, personal de acceso y administradores), con cobro por cuotas, validación de accesos en tiempo real y un panel administrativo completo.",
+      en: "Build a comprehensive membership management system serving three distinct profiles (members, access staff, and administrators), with installment billing, real-time access validation, and a complete admin panel.",
+    },
+    solution: {
+      es: "Desarrollé la solución full-stack de punta a punta: modelado de datos, API REST, interfaces de socios y administradores, y pruebas automatizadas (unitarias y de servicios). Migré el almacenamiento de comprobantes de base64-en-MongoDB a la API de Dropbox (OAuth con refresh tokens y links compartidos raw=1) para reducir el peso de los documentos y de las respuestas del servidor.",
+      en: "Developed the full-stack solution end to end: data modeling, REST API, member and admin interfaces, and automated testing (unit and service). Migrated receipt storage from base64-in-MongoDB to the Dropbox API (OAuth with refresh tokens and raw=1 shared links) to reduce document size and server response weight.",
+    },
+    results: {
+      es: [
+        "Pagos y cuotas con carga de comprobantes y aprobación/rechazo fundamentado",
+        "Aprobación de pago que extiende automáticamente la vigencia de la membresía",
+        "Integración Dropbox para almacenamiento de comprobantes (más liviano y escalable)",
+        "Credenciales QR firmadas con JWT y escáner en tiempo real para el personal de admisión",
+        "Notificaciones en tiempo real con Socket.IO y push (VAPID)",
+        "Auth con JWT + Google OAuth y roles granulares (socio, staff, admins, superadmin)",
+        "Panel admin para gestión de socios, staff, planes, tags y configuración",
+      ],
+      en: [
+        "Installment payments with receipt upload and justified approval/rejection",
+        "Payment approval automatically extends membership validity",
+        "Dropbox integration for receipt storage (lighter and scalable)",
+        "JWT-signed QR credentials with real-time scanner for admission staff",
+        "Real-time notifications with Socket.IO and push (VAPID)",
+        "JWT + Google OAuth auth with granular roles (member, access staff, admins, superadmin)",
+        "Admin panel for managing members, staff, plans, tags, and configuration",
+      ],
+    },
+    featured: true,
+    status: "active",
+  },
+  {
     slug: "flowfolio",
     title: {
       en: "Flowfolio",
