@@ -72,7 +72,8 @@ export const projects = [
       en: "Flowfolio solves the typical chaos of freelance work: scattered emails, disorganized files, manual updates, and duplicated communication. With Flowfolio, each client has their own mini-dashboard where they can track progress, approve tasks, and communicate. The integrated AI automates repetitive tasks like summaries, frequently asked questions, and task generation from briefs.",
       es: "Flowfolio resuelve el caos típico del trabajo freelance: emails sueltos, archivos dispersos, actualizaciones manuales y comunicación duplicada. Con Flowfolio, cada cliente tiene su propio mini-dashboard donde puede seguir el progreso, aprobar tareas y comunicarse. La IA integrada automatiza tareas repetitivas como resúmenes, respuestas frecuentes y generación de tareas desde briefs.",
     },
-    year: 2026,
+    year: 2026,
+
     color: "from-blue-600 to-blue-800",
     tags: [
       "Next.js",
@@ -146,7 +147,8 @@ export const projects = [
       en: "Platform built for the EXPERIMENTAL Global team to streamline communication, coordination, direction, and review of hackathon challenges. It connects organizations with real challenges and global talent to design, execute, and validate technology solutions—validated projects can receive compensation or be spun out as startups. I delivered the bilingual marketing landing (Astro 6, Tailwind CSS v4) and the production web app (Next.js 16, Express, MongoDB) with role-based dashboards, challenge lifecycle, teams, submissions, mentor scoring, and admin analytics.",
       es: "Plataforma diseñada para el equipo de EXPERIMENTAL Global con el fin de facilitar la comunicación, el orden, la dirección y la revisión de desafíos de hackathon. Conecta organizaciones con retos reales y talento global para diseñar, ejecutar y validar soluciones tecnológicas; los proyectos validados acceden a compensación o se constituyen como startups. Desarrollé el landing bilingüe (Astro 6, Tailwind CSS v4) y la aplicación en producción (Next.js 16, Express, MongoDB) con dashboards por rol, ciclo de vida de retos, equipos, entregas, evaluación por mentores y analíticas de administración.",
     },
-    year: 2026,
+    year: 2026,
+
     color: "from-indigo-600 to-violet-800",
     tags: [
       "Astro",
@@ -206,7 +208,8 @@ export const projects = [
       en: "A strategic co-founded project designed to centralize race logistics. I lead the technical architecture and development of the MVP, creating a platform where runners can find events, coordinate shared transportation, and manage lodging in a social, community-driven environment.",
       es: "Un proyecto de co-fundación estratégica diseñado para centralizar la logística de carreras. Lidero la arquitectura técnica y el desarrollo del MVP, creando una plataforma donde los corredores pueden encontrar eventos, coordinar transporte compartido y gestionar alojamiento en un entorno social impulsado por la comunidad.",
     },
-    year: 2026,
+    year: 2026,
+
     color: "from-red-500 to-red-700",
     tags: [
       "React",
@@ -263,7 +266,8 @@ export const projects = [
       en: "A comprehensive medical blog and knowledge platform for Around Notes, designed to educate healthcare professionals and share insights about AI in medicine. I developed the complete blog architecture, content management system, and user experience, focusing on accessibility, SEO optimization, and medical content presentation standards.",
       es: "Un blog médico integral y plataforma de conocimiento para Around Notes, diseñado para educar a profesionales de la salud y compartir conocimientos sobre IA en medicina. Desarrollé la arquitectura completa del blog, sistema de gestión de contenido, y experiencia de usuario, enfocándome en accesibilidad, optimización SEO, y estándares de presentación de contenido médico.",
     },
-    year: 2025,
+    year: 2025,
+
     color: "from-blue-600 to-blue-800",
     tags: ["Next.js", "MDX", "SEO", "Content Management", "Healthcare", "Blog"],
     image: "/project-images/aroundnotes-blog-image.webp",
@@ -312,7 +316,8 @@ export const projects = [
       en: "Around Notes is a HIPAA-safe, browser-based AI platform built by physicians for inpatient medicine. It generates quality medical notes, provides access to PHI secure AI models, and streamlines clinical workflows. As part of the development team, I contributed to frontend development focusing on UX/UI, performance optimization, and key integrations including dashboard, note modules, EKG and radiology modules, and user management systems.",
       es: "Around Notes es una plataforma de IA segura HIPAA, basada en navegador, construida por médicos para medicina hospitalaria. Genera notas médicas de calidad, proporciona acceso a modelos de IA seguros para PHI, y optimiza los flujos de trabajo clínicos. Como parte del equipo de desarrollo, contribuí al desarrollo frontend enfocándome en UX/UI, optimización de rendimiento, e integraciones clave incluyendo dashboard, módulos de notas, módulos de EKG y radiología, y sistemas de gestión de usuarios.",
     },
-    year: 2025,
+    year: 2025,
+
     color: "from-purple-800 to-purple-900",
     tags: ["React", "TypeScript", "UX/UI", "Performance", "Healthcare", "AI"],
     image: "/project-images/aroundnotes-app-image.webp",
@@ -361,7 +366,8 @@ export const projects = [
       en: "A landing page for the app 'Around Notes', provides a platform for users to create and manage medical notes. The application features a modern design and utilizes various technologies to provide a seamless user experience.",
       es: "Una Landing page para la aplicación 'Around Notes', a una plataforma para que usuarios médicos creen y administren notas médicas. La aplicación presenta un diseño moderno y utiliza varias tecnologías para proporcionar una experiencia de usuario perfecta.",
     },
-    year: 2025,
+    year: 2025,
+
     color: "from-purple-300 to-purple-500",
     tags: ["Astro", "Tailwind", "SEO", "Performance"],
     image: "/project-images/aroundnotes-landing-image.webp",
@@ -405,7 +411,8 @@ export const projects = [
     description: {
       en: "Web platform developed for management of institutions, teachers, and students focused on public schools, private and university education. It is part of a larger ecosystem that seeks to facilitate the integration of talents into modernity.",
       es: "Plataforma web desarrollada para gestión de instituciones, profesores, y alumnos enfocado en escuelas públicas, privadas de educación secundaria y universitaria. Forma parte de un ecosistema más grande que busca facilitar la integración de los talentos a la modernidad. ",
-    },
+    },
+
     color: "from-blue-700 to-gray-600",
     tags: ["Next.js", "Tailwind", "TypeScript", "Express", "MongoDB"],
     image: "/project-images/sigii-image.png",
@@ -452,7 +459,8 @@ export const projects = [
       en: "Connects mining companies with talent. Uses AI to match profiles with job offers.",
       es: "Conecta empresas mineras con talento. Usa IA para emparejar perfiles con ofertas laborales.",
     },
-    year: 2025,
+    year: 2025,
+
     color: "from-yellow-600 to-yellow-800",
     tags: ["Next.js", "Express.js", "TypeScript", "Cloudinary"],
     image: "/project-images/mtn-image.png",
@@ -496,7 +504,8 @@ export const projects = [
     description: {
       en: "Tech collective focused on digital solutions, sustainability and innovation.",
       es: "Colectivo tecnológico enfocado en soluciones digitales, sostenibilidad e innovación.",
-    },
+    },
+
     color: "from-sky-600 to-sky-800",
     tags: ["Next.js", "TypeScript", "Tailwind", "Node.js"],
     image: "/project-images/excelso-image.png",
@@ -519,7 +528,8 @@ export const projects = [
     description: {
       en: "AI agent for promoting sustainability and transparency in extractive industries.",
       es: "Agente IA que promueve sostenibilidad y transparencia en industrias extractivas.",
-    },
+    },
+
     color: "from-green-600 to-green-800",
     tags: ["Next.js", "TypeScript", "IA", "Cloudinary"],
     image: "/project-images/jema-image.png",
@@ -562,7 +572,8 @@ export const projects = [
     description: {
       en: "Website for an NGO rescuing street animals. Led product and project management.",
       es: "Sitio web para ONG de rescate animal. Lideré gestión de producto y proyecto.",
-    },
+    },
+
     color: "from-pink-600 to-pink-800",
     tags: ["Next.js", "Strapi", "Tailwind", "TypeScript"],
     image: "/project-images/huellitas-image.png",
@@ -607,7 +618,8 @@ export const projects = [
     description: {
       en: "A personalized website and with an exclusive design, focused on the consultant, their needs and along with the client's criteria. It is a freelance job. In addition to programming and design, I collaborated in the creation of social networks, logos, online presence, page maintenance, domain and optimization of SEO.",
       es: "Una web personalizada y con un diseño exclusivo, enfocado en la consultora, sus necesidades y a la par de los criterios del cliente. Es un trabajo freelance. Además de la programación y diseño, colaboré en la creación de las redes sociales, logos, presencia en línea, mantenimiento de la página, dominio y optimización de SEO.",
-    },
+    },
+
     color: "from-indigo-600 to-indigo-800",
     tags: ["Nextjs", "Tailwind", "Typescript"],
     image: "/project-images/dc-image.png",
@@ -651,7 +663,8 @@ export const projects = [
     description: {
       en: "Web and Mobile application that makes use of artificial intelligence, designed to offer personalized recommendations of healthy and accessible recipes, ask you to enter your ingredients you have at home. Based on these criteria, the website analyzes the user's needs and suggests recipe options, taking into account factors such as diseases, allergies, and food preferences.",
       es: "Aplicación web y mobile que hace uso de inteligencia artificial, diseñada para ofrecer recomendaciones personalizadas de recetas saludables y accesibles, te solicita ingresar tus ingredientes que tengas en casa. Basado en esos criterios, la web analiza las necesidades del usuario y sugiere opciones de recetas, teniendo en cuenta factores como enfermedades, alergias, y preferencias alimenticias.",
-    },
+    },
+
     color: "from-gray-600 to-gray-800",
     tags: ["Next.js", "Tailwind", "TypeScript"],
     image: "/project-images/fuddy-app-image.png",
@@ -695,7 +708,8 @@ export const projects = [
     description: {
       en: "Mailprex is a web platform designed to simplify the process of sending forms from websites to emails. You can easily integrate a React Hook into your project, to which you pass the minimum data that allow the shipping and content of the form to reach your chosen email without major inconveniences.",
       es: "Mailprex es una plataforma web diseñada para simplificar el proceso de envío de formularios desde sitios web a correos electrónicos. Puedes integrar fácilmente un React Hook a tu proyecto, al cual le pasas los datos mínimos que permiten el envío y el contenido del formulario llega a tu correo elegido sin mayores inconvenientes.",
-    },
+    },
+
     color: "from-blue-600 to-blue-800",
     tags: ["Next.js", "Express.js", "Node.js", "Tailwind", "TypeScript"],
     image: "/project-images/mailprex-app.png",
