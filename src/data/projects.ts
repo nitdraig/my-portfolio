@@ -1,4 +1,28 @@
-export const projects = [
+import type { DeliveryType, Industry } from "./projectTaxonomy";
+
+export type Project = {
+  slug: string;
+  title: { en: string; es: string };
+  shortDescription: { en: string; es: string };
+  description: { en: string; es: string };
+  year: number;
+  color: string;
+  tags: string[];
+  image: string;
+  demoUrl: string;
+  githubUrl?: string;
+  challenge?: { en: string; es: string };
+  solution?: { en: string; es: string };
+  results?: { en: string[]; es: string[] };
+  featured?: boolean;
+  homeOrder?: number;
+  status?: string;
+  deliveryType: DeliveryType;
+  industry: Industry;
+  highlightMetric?: { en: string; es: string };
+};
+
+export const projects: Project[] = [
   {
     slug: "ate",
     title: {
@@ -57,6 +81,8 @@ export const projects = [
     },
     featured: true,
     status: "active",
+    deliveryType: "platform",
+    industry: "nonprofit",
   },
   {
     slug: "flowfolio",
@@ -132,6 +158,8 @@ export const projects = [
     },
     featured: true,
     status: "active",
+    deliveryType: "platform",
+    industry: "freelance",
   },
   {
     slug: "experimental-global-app-landing",
@@ -193,6 +221,8 @@ export const projects = [
     },
     featured: true,
     status: "active",
+    deliveryType: "platform",
+    industry: "hackathons",
   },
   {
     slug: "meet-my-race",
@@ -251,6 +281,8 @@ export const projects = [
     },
     featured: true,
     status: "active",
+    deliveryType: "platform",
+    industry: "sports",
   },
   {
     slug: "around-notes-blog",
@@ -301,6 +333,8 @@ export const projects = [
     },
     featured: false,
     status: "active",
+    deliveryType: "landing",
+    industry: "healthcare",
   },
   {
     slug: "around-notes-app",
@@ -351,6 +385,8 @@ export const projects = [
     },
     featured: true,
     status: "active",
+    deliveryType: "platform",
+    industry: "healthcare",
   },
   {
     slug: "around-notes-landing",
@@ -397,6 +433,8 @@ export const projects = [
     },
     featured: true,
     status: "active",
+    deliveryType: "landing",
+    industry: "healthcare",
   },
   {
     slug: "sigii-app",
@@ -444,6 +482,8 @@ export const projects = [
     featured: false,
     year: 2024,
     status: "active",
+    deliveryType: "platform",
+    industry: "education",
   },
   {
     slug: "mining-talent-net",
@@ -490,6 +530,8 @@ export const projects = [
     },
     featured: true,
     status: "active",
+    deliveryType: "platform",
+    industry: "mining",
   },
   {
     slug: "excelso-tech-group",
@@ -514,6 +556,8 @@ export const projects = [
     featured: true,
     year: 2025,
     status: "active",
+    deliveryType: "landing",
+    industry: "tech",
   },
   {
     slug: "jema-ai-impact",
@@ -558,6 +602,8 @@ export const projects = [
     featured: true,
     year: 2025,
     status: "active",
+    deliveryType: "platform",
+    industry: "sustainability",
   },
   {
     slug: "huellitasctg-webapp",
@@ -604,6 +650,8 @@ export const projects = [
     featured: false,
     year: 2024,
     status: "active",
+    deliveryType: "platform",
+    industry: "nonprofit",
   },
   {
     slug: "dc-landing-page",
@@ -649,6 +697,8 @@ export const projects = [
     },
     year: 2024,
     status: "active",
+    deliveryType: "landing",
+    industry: "consulting",
   },
   {
     slug: "fuddy-app",
@@ -694,6 +744,8 @@ export const projects = [
     featured: false,
     year: 2024,
     status: "active",
+    deliveryType: "mvp",
+    industry: "food",
   },
   {
     slug: "mailprex",
@@ -740,5 +792,7 @@ export const projects = [
     featured: false,
     year: 2024,
     status: "active",
+    deliveryType: "platform",
+    industry: "devtools",
   },
 ];

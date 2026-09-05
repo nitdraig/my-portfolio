@@ -30,7 +30,7 @@ export const ui = {
       ctaProjects: "Ver mis trabajos",
       ctaContact: "Hablemos!",
       available: "Disponible",
-      techStack: "React • AI • Node.js • GO • Python • GO • Python",
+      techStack: "React • AI • Node.js • GO • Python",
     },
     about: {
       title: "Sobre Mí",
