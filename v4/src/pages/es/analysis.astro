@@ -20,6 +20,7 @@ const locale = "es";
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; });
   }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
   function renderAnalysis() {
     var raw = sessionStorage.getItem('agustinIdeaAnalysis');
@@ -28,27 +29,37 @@ const locale = "es";
     if (!raw) { emptyEl.classList.add('show'); return; }
     var data;
     try { data = JSON.parse(raw); } catch(e) { data = null; }
-    if (!data || !data.idea) { emptyEl.classList.add('show'); return; }
+    if (!data || !data.idea || typeof data.idea !== 'string') { emptyEl.classList.add('show'); return; }
+
+    /* Sanitize: strip any HTML from stored data */
+    var s = function(str) { return String(str).replace(/<[^>]*>/g, '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); };
+    data.idea = s(data.idea);
+    if (data.polishedIdea) data.polishedIdea = s(data.polishedIdea);
+    if (Array.isArray(data.tags)) data.tags = data.tags.map(s);
+    if (Array.isArray(data.steps)) data.steps = data.steps.map(s);
+    if (Array.isArray(data.mvp)) data.mvp = data.mvp.map(s);
+    if (Array.isArray(data.projects)) data.projects.forEach(function(p) { if (p.title) p.title = s(p.title); if (p.category) p.category = s(p.category); if (p.type) p.type = s(p.type); });
 
     var isFallback = data.source === 'fallback';
+    var isRateLimit = data.source === 'rate_limit';
 
-    var subject = encodeURIComponent('Idea: ' + data.idea.substring(0, 50));
-    var body = encodeURIComponent(
-      'Hola Agustín,\n\nTengo una idea que me gustaría construir:\n\n"' + data.idea + '"\n\n' +
-      'Componentes inferidos: ' + (data.tags || []).join(', ') + '\n\n' +
-      'Propuesta MVP:\n' + (data.mvp || []).map(function(s, i) { return (i+1)+'. '+s; }).join('\n') + '\n\n' +
-      'Próximos pasos:\n' + (data.steps || []).map(function(s, i) { return (i+1)+'. '+s; }).join('\n') + '\n\n' +
-      'Hablemos.'
-    );
-    var mailto = 'mailto:me@agustin.top?subject=' + subject + '&body=' + body;
-
-    var fallbackBanner = isFallback
+    var fallbackBanner = (isFallback || isRateLimit)
       ? '<div class="fallback-banner reveal" style="animation-delay:0ms">' +
         '<div class="fallback-icon">⚠</div>' +
         '<div class="fallback-text">' +
-          '<strong>Análisis local</strong> — La API de análisis no está disponible desde este entorno. ' +
-          'Estos son los resultados generados localmente. Para un análisis completo con IA, ' +
-          '<a href="mailto:me@agustin.top?subject=' + encodeURIComponent('Análisis de idea: ' + data.idea.substring(0, 50)) + '">enviame un email</a>.' +
+          '<strong>' + (isRateLimit ? 'Límite alcanzado' : 'Análisis local') + '</strong> — ' +
+          (isRateLimit
+            ? pick([
+              'Se alcanzó el límite de análisis. Estos resultados fueron generados localmente. Intentá de nuevo en unos minutos.',
+              'El servicio de análisis está ocupado. Lo que ves abajo fue armado localmente — la idea es válida, la capa de IA está temporalmente fuera.',
+              'Límite de uso alcanzado. La estructura del análisis se generó sin conexión a la API. Probá de nuevo más tarde.'
+            ])
+            : pick([
+              'La API de análisis no está disponible desde este entorno. Los resultados que ves fueron generados localmente.',
+              'Sin conexión al servicio de análisis. Estos son los pasos que se armaron desde acá — para el análisis completo con IA, enviame un email.',
+              'El backend de análisis no respondió. Estos resultados son una guía inicial generada localmente.'
+            ]) +
+              '<a href="mailto:me@agustin.top?subject=' + encodeURIComponent('Análisis de idea: ' + data.idea.substring(0, 50)) + '"> Contactame</a>.') +
         '</div>' +
         '<button class="fallback-retry" id="retry-btn" type="button">Reintentar</button>' +
         '</div>'
@@ -70,15 +81,12 @@ const locale = "es";
       polishedHtml +
       '<section class="stage-section reveal" style="animation-delay:220ms"><div class="stage-section-title">Lo que dijiste</div><div class="stage-text">' + escapeHtml(data.idea) + '</div></section>' +
       '<section class="stage-section reveal" style="animation-delay:280ms"><div class="stage-section-title">Componentes inferidos</div><div class="stage-chips">' + tagsHtml + '</div></section>' +
-      '<section class="stage-section reveal" style="animation-delay:340ms"><div class="stage-section-title">Proyectos similares</div><div class="stage-cards">' + (projectsHtml || '<div class="stage-text">No hay coincidencias directas en el portfolio aún — esta idea es una dirección nueva.</div>') + '</div></section>' +
+      '<section class="stage-section reveal" style="animation-delay:340ms"><div class="stage-section-title">Proyectos que puedes explorar</div><div class="stage-cards">' + (projectsHtml || '<div class="stage-text">No hay coincidencias directas en el portfolio aún — esta idea es una dirección nueva.</div>') + '</div></section>' +
       (stepsHtml ? '<section class="stage-section reveal" style="animation-delay:420ms"><div class="stage-section-title">Próximos pasos</div><ul class="stage-list">' + stepsHtml + '</ul></section>' : '') +
       (mvpHtml ? '<section class="stage-section reveal" style="animation-delay:500ms"><div class="stage-section-title">Propuesta MVP</div><ul class="stage-list">' + mvpHtml + '</ul></section>' : '') +
-      '<div class="stage-actions reveal" style="animation-delay:620ms"><a class="btn-primary" href="' + mailto + '">Construir este MVP</a><a class="btn-secondary" href="/' + locale + '/" id="new-idea-btn">Nueva idea</a><a class="btn-secondary" href="/' + locale + '/">Volver a orbitar</a></div>'
+      '<div class="stage-actions reveal" style="animation-delay:620ms"><button class="btn-primary" id="send-idea-btn" type="button">Construir este MVP</button><a class="btn-secondary" href="/' + locale + '/">Volver a orbitar</a></div>' +
+      '<div class="powered-by reveal" style="animation-delay:700ms"><span>Análisis impulsado por</span> <a href="https://flowfolio.space" target="_blank" rel="noopener"><img src="/images/flowfolio-logo.webp" alt="Flowfolio" width="72" height="20" loading="lazy" /> Flowfolio</a></div>'
     );
-
-    document.getElementById('new-idea-btn').addEventListener('click', function() {
-      sessionStorage.removeItem('agustinIdeaAnalysis');
-    });
 
     var retryBtn = document.getElementById('retry-btn');
     if (retryBtn) {
@@ -87,9 +95,46 @@ const locale = "es";
         window.location.href = '/' + locale + '/';
       });
     }
+
+    var sendBtn = document.getElementById('send-idea-btn');
+    if (sendBtn) {
+      sendBtn.addEventListener('click', function() {
+        var origText = sendBtn.textContent;
+        sendBtn.textContent = 'Enviando...';
+        sendBtn.disabled = true;
+        fetch('/api/send-idea', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            idea: data.idea,
+            polishedIdea: data.polishedIdea || '',
+            tags: data.tags || [],
+            steps: data.steps || [],
+            mvp: data.mvp || [],
+            language: locale
+          })
+        }).then(function(r) { return r.json(); }).then(function(res) {
+          if (res.success) {
+            sendBtn.textContent = 'Enviado!';
+            setTimeout(function() { sendBtn.textContent = origText; sendBtn.disabled = false; }, 2000);
+          } else {
+            throw new Error(res.error);
+          }
+        }).catch(function() {
+          sendBtn.textContent = 'Error - reintentá';
+          setTimeout(function() { sendBtn.textContent = origText; sendBtn.disabled = false; }, 2000);
+        });
+      });
+    }
   }
 
-  document.addEventListener('DOMContentLoaded', renderAnalysis);
+  /* Script runs after </main> in the built HTML — DOMContentLoaded already fired.
+     Call directly; the DOM is fully parsed at this point. */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAnalysis);
+  } else {
+    renderAnalysis();
+  }
 
   window.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') { e.preventDefault(); window.location.href = '/' + locale + '/'; }
@@ -97,8 +142,8 @@ const locale = "es";
   </script>
 </BaseLayout>
 
-<style>
-  main { position: relative; z-index: 10; max-width: 820px; margin: 0 auto; padding: 120px 32px 100px; }
+<style is:global>
+  main#main { position: relative; z-index: 10; max-width: 820px; margin: 0 auto; padding: 120px 32px 100px; }
   .empty { min-height: 60vh; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; }
   .empty.show { display: flex; }
   .empty-icon { font-size: 32px; color: var(--color-text-faint); margin-bottom: 4px; }
@@ -138,6 +183,10 @@ const locale = "es";
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.25); }
   .btn-secondary { display: inline-block; background: transparent; color: var(--color-text-dim); border: 1px solid var(--color-line); font-family: var(--font-mono); font-size: 12px; padding: 10px 18px; border-radius: 6px; transition: border-color .2s, color .2s; text-decoration: none; }
   .btn-secondary:hover { border-color: var(--color-text-faint); color: var(--color-text); }
+  .powered-by { display: flex; align-items: center; gap: 8px; margin-top: 40px; font-family: var(--font-mono); font-size: 13px; color: var(--color-text-faint); opacity: .6; }
+  .powered-by a { color: inherit; display: flex; align-items: center; gap: 6px; }
+  .powered-by img { height: 20px; width: auto; filter: brightness(.8); transition: filter .2s; }
+  .powered-by a:hover img { filter: brightness(1); }
   .reveal { opacity: 0; transform: translateY(12px); animation: fade-up .6s ease forwards; }
   @keyframes fade-up { to { opacity: 1; transform: translateY(0); } }
   @media (max-width: 720px) {

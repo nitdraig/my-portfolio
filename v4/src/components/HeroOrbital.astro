@@ -45,6 +45,10 @@ const PROJECTS = getNodeProjects(locale);
           <span>{t.modalHint}</span>
           <button type="button" class="btn-primary" id="cmdbar-modal-send">{t.modalAnalyze}</button>
         </div>
+        <div class="cmdbar-modal-powered">
+          <span>Powered by</span>
+          <a href="https://flowfolio.space" target="_blank" rel="noopener"><img src="/images/flowfolio-logo.webp" alt="Flowfolio" width="72" height="20" loading="lazy" /> Flowfolio</a>
+        </div>
         <div class="cmdbar-modal-loading" id="cmdbar-modal-loading" aria-hidden="true">
           <div class="ai-thinking" aria-hidden="true">
             <div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -88,19 +92,19 @@ const PROJECTS = getNodeProjects(locale);
         </div>
       </div>
       <div class="ai-result" id="ai-result">
-        <div class="ai-result-label">POLISHED IDEA</div>
-        <div class="ai-result-section-title">Recommended pitch</div>
+        <div class="ai-result-label" id="ai-result-label">IDEA PULIDA</div>
+        <div class="ai-result-section-title" id="ai-result-pitch-title">Pitch recomendado</div>
         <div class="ai-result-pitch" id="ai-result-pitch"></div>
         <div class="ai-result-section">
-          <h4>Inferred components</h4>
+          <h4>Componentes inferidos</h4>
           <div class="ai-result-chips" id="ai-result-chips"></div>
         </div>
         <div class="ai-result-section">
-          <h4>Recommended next steps</h4>
+          <h4>Próximos pasos recomendados</h4>
           <ul class="ai-result-list" id="ai-result-steps"></ul>
         </div>
         <div class="ai-result-actions">
-          <a class="btn-primary" id="ai-send-link" href="#">Send to Agustín</a>
+          <button class="btn-primary" id="ai-send-link" type="button">{t.analyzeBtn}</button>
           <button class="btn-secondary" id="ai-new-idea" type="button">{t.newIdea}</button>
         </div>
       </div>
@@ -183,7 +187,8 @@ const PROJECTS = getNodeProjects(locale);
       p.tags.some(t => lower.includes(t)) ||
       tags.some(tag => p.tags.includes(tag.toLowerCase()))
     );
-    if (matches.length === 0) matches = PROJECTS.slice(0,3);
+    if (matches.length === 0) matches = shuffle(PROJECTS);
+    else matches = shuffle(matches);
     return matches.slice(0,3);
   }
 
@@ -233,12 +238,26 @@ const PROJECTS = getNodeProjects(locale);
     if (cmdModalSend) cmdModalSend.disabled = false;
   }
 
+  function showCmdbarError(msg) {
+    var loadingText = cmdModalShell.querySelector('.cmdbar-modal-loading-text');
+    if (loadingText) loadingText.textContent = msg;
+    cmdModalShell.classList.add('loading');
+    setTimeout(function() {
+      cmdModalShell.classList.remove('loading');
+      if (loadingText) loadingText.textContent = currentLocale === 'es' ? 'Pensando...' : 'Thinking...';
+    }, 2500);
+  }
+
   function openCmdbarModal() {
     if (cmdModal.classList.contains('show')) return;
     cmdModal.classList.add('show');
     cmdModal.setAttribute('aria-hidden','false');
     cmdModalInput.value = cmdInput.value;
     document.documentElement.classList.add('locked');
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = '-' + window.scrollY + 'px';
+    document.body.style.width = '100%';
     requestAnimationFrame(() => cmdModalInput.focus());
   }
 
@@ -247,8 +266,33 @@ const PROJECTS = getNodeProjects(locale);
     cmdModal.classList.remove('show');
     cmdModal.setAttribute('aria-hidden','true');
     cmdInput.value = cmdModalInput.value;
+    var scrollY = document.body.style.top;
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
     document.documentElement.classList.remove('locked');
+    window.scrollTo(0, parseInt(scrollY || '0') * -1);
   }
+
+  /* Prevent background scroll when modal is open */
+  cmdModal.addEventListener('touchmove', function(e) {
+    if (!cmdModal.classList.contains('show')) return;
+    var target = e.target;
+    var inShell = cmdModalShell.contains(target);
+    var inTextarea = target === cmdModalInput;
+    if (!inShell && !inTextarea) { e.preventDefault(); return; }
+    if (inTextarea) {
+      var el = target;
+      if (el.scrollHeight <= el.clientHeight) e.preventDefault();
+    }
+  }, { passive: false });
+
+  /* Block wheel events from reaching Three.js canvas when modal is open */
+  cmdModal.addEventListener('wheel', function(e) {
+    if (!cmdModal.classList.contains('show')) return;
+    e.stopPropagation();
+  }, { passive: true });
 
   cmdInput.addEventListener('focus', openCmdbarModal);
   cmdModalInput.addEventListener('input', () => { cmdInput.value = cmdModalInput.value; });
@@ -260,10 +304,72 @@ const PROJECTS = getNodeProjects(locale);
   cmdModalSend.addEventListener('click', () => { cmdForm.dispatchEvent(new Event('submit')); });
   cmdModal.addEventListener('click', (e) => { if (e.target === cmdModal && !cmdModalInput.value.trim()) closeCmdbarModal(); });
 
+  /* Local fallback when API is unreachable or rate-limited */
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function shuffle(arr) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = a[i]; a[i] = a[j]; a[j] = tmp; } return a; }
+
+  function generateFallbackAnalysis(text, lang) {
+    var lower = text.toLowerCase();
+    var verb = lower.match(/connect|track|manage|share|find|match|automate|build|launch/);
+    var v = verb ? verb[0] : (lang === 'es' ? 'construye' : 'builds');
+    var clean = text.replace(/^(i want to|quiero|me gustaría|i would like to|i need to)\s*/i, '').replace(/\.$/, '');
+
+    var polishedEs = [
+      'Una plataforma que ' + v + ' ' + clean + ', diseñada para escalar con un enfoque lean y centrada en el usuario desde el primer día.',
+      'Una solución digital para ' + clean + ', pensada para resolver un problema real con la herramienta más simple posible.',
+      'Un producto que ataca el problema de ' + clean + ', con una MVP rápida y un camino claro hacia la iteración.',
+    ];
+    var polishedEn = [
+      'A platform that ' + v + ' ' + clean + ', designed to scale with a lean approach and user-first from day one.',
+      'A digital solution for ' + clean + ', built to solve a real problem with the simplest possible tool.',
+      'A product tackling ' + clean + ', with a fast MVP and a clear path toward iteration.',
+    ];
+
+    var stepsEs = [
+      ['Validar la hipótesis central con 5 usuarios reales', 'Diseñar el flujo más simple que entregue valor', 'Construir un MVP funcional en 2-4 semanas', 'Lanzar a early adopters y capturar feedback', 'Iterar sobre el punto de mayor fricción antes de agregar features'],
+      ['Definir el problema central en una oración', 'Mapear el flujo del usuario de principio a fin', 'Prototipar la interfaz principal en 48 horas', 'Medir con métricas reales, no suposiciones', 'Decidir entre pivotar o perseverar según datos'],
+      ['Identificar al usuario ideal y su dolor más urgente', 'Reducir la idea a su acción nuclear', 'Construir solo lo que validó la hipótesis', 'Lanzar y observar, no asumir', 'Crecer solo cuando el core funciona'],
+    ];
+    var stepsEn = [
+      ['Validate the core hypothesis with 5 real users', 'Design the simplest flow that delivers value', 'Build a functional MVP in 2-4 weeks', 'Release to early adopters and capture feedback', 'Iterate on the highest-friction step before adding features'],
+      ['Define the core problem in one sentence', 'Map the user journey end to end', 'Prototype the main interface in 48 hours', 'Measure with real metrics, not assumptions', 'Decide whether to pivot or persevere based on data'],
+      ['Identify the ideal user and their most urgent pain point', 'Reduce the idea to its nuclear action', 'Build only what the hypothesis validated', 'Launch and observe, don\'t assume', 'Grow only when the core works'],
+    ];
+
+    var mvpEs = [
+      ['Interfaz web limpia que realice la acción principal en menos de 60 segundos', 'Sistema de autenticación simple con profiles básicos', 'Core logic optimizada para el caso de uso principal', 'Dashboard de analytics para medir engagement y iterar'],
+      ['Pantalla principal con la acción clave en primer plano', 'Onboarding guiado en 3 pasos', 'Backbone técnico simple (API + base de datos)', 'Loop de feedback integrado para el usuario'],
+      ['Landing funcional con CTA claro', 'Módulo central que ejecuta la promesa del producto', 'Gestión básica de usuarios', 'Panel de métricas para tomar decisiones'],
+    ];
+    var mvpEn = [
+      ['Clean web interface that completes the core action in under 60 seconds', 'Simple authentication system with basic profiles', 'Core logic optimized for the primary use case', 'Analytics dashboard to measure engagement and iterate'],
+      ['Main screen with the key action front and center', '3-step guided onboarding', 'Simple technical backbone (API + database)', 'Built-in feedback loop for the user'],
+      ['Functional landing page with clear CTA', 'Core module that delivers the product promise', 'Basic user management', 'Metrics panel for decision-making'],
+    ];
+
+    return {
+      idea: pick(lang === 'es' ? polishedEs : polishedEn),
+      steps: pick(lang === 'es' ? stepsEs : stepsEn),
+      mvp: pick(lang === 'es' ? mvpEs : mvpEn),
+    };
+  }
+
   cmdForm.addEventListener('submit', (e) => {
     e.preventDefault();
     var val = cmdInput.value.trim();
     if (!val || isAnalyzing) return;
+
+    /* --- Client-side validation --- */
+    if (val.length < 3) { showCmdbarError(currentLocale === 'es' ? 'La idea es muy corta. Describila un poco más.' : 'The idea is too short. Describe it a bit more.'); return; }
+    if (val.length > 2000) { showCmdbarError(currentLocale === 'es' ? 'La idea es muy larga. Resumila en 2000 caracteres.' : 'The idea is too long. Summarize it in 2000 characters.'); return; }
+    var injectionRe = /ignore\s+(all\s+)?(previous|prior|above)|disregard\s+(all\s+)?(previous|prior)|you\s+are\s+now\s+(a|an)|act\s+as\s+(a|an)\s+(different|new)|from\s+now\s+on\s+(you\s+)?(will|must|are)|pretend\s+(you\s+)?(are|to\s+be)/i;
+    if (injectionRe.test(val)) { showCmdbarError(currentLocale === 'es' ? 'Entrada no válida. Describí una idea de proyecto.' : 'Invalid input. Describe a project idea.'); return; }
+    var offTopicRe = /what\s+(model|ai|llm|gpt|claude)\s+are\s+you|who\s+(made|created|built)\s+you|write\s+(me\s+)?(a\s+)?(poem|song|story)|tell\s+me\s+(a\s+)?joke|what\s+is\s+the\s+weather/i;
+    if (offTopicRe.test(val)) { showCmdbarError(currentLocale === 'es' ? 'Este analizador solo acepta ideas de proyectos.' : 'This analyzer only accepts project ideas.'); return; }
+    var wordCount = val.split(/\s+/).filter(function(w) { return /[a-zA-Záéíóúñ]/.test(w); }).length;
+    if (wordCount < 2) { showCmdbarError(currentLocale === 'es' ? 'Describí tu idea con un poco más de detalle.' : 'Describe your idea with a bit more detail.'); return; }
+    /* --- End client-side validation --- */
+
     isAnalyzing = true;
     cmdModalShell.classList.add('loading');
     cmdModalInput.disabled = true;
@@ -271,59 +377,60 @@ const PROJECTS = getNodeProjects(locale);
 
     var tags = decomposeIdea(val);
 
+    /* --- Call /api/analyze proxy --- */
     fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ projectIdea: val, language: currentLocale === 'es' ? 'es' : 'en' })
-    })
-    .then(function(res) {
+      body: JSON.stringify({ projectIdea: val, language: currentLocale })
+    }).then(function(res) {
       if (res.status === 429) {
-        var loadingText = cmdModalShell.querySelector('.cmdbar-modal-loading-text');
-        if (loadingText) loadingText.textContent = currentLocale === 'es' ? 'Demasiadas solicitudes — esperá un momento' : 'Too many requests — wait a moment';
-        isAnalyzing = false;
-        cmdModalShell.classList.remove('loading');
-        cmdModalInput.disabled = false;
-        cmdModalSend.disabled = false;
-        return;
+        throw new Error(currentLocale === 'es'
+          ? 'Límite de análisis alcanzado. Intentá de nuevo en unos minutos.'
+          : 'Analysis rate limit reached. Try again in a few minutes.');
       }
-      if (!res.ok) throw new Error('API ' + res.status);
       return res.json();
-    })
-    .then(function(res) {
-      if (!res) return;
-      var apiData = res.data || res;
+    }).then(function(result) {
+      if (!result.success) {
+        throw new Error(result.message || (currentLocale === 'es' ? 'No se pudo analizar la idea.' : 'Could not analyze the idea.'));
+      }
+      var data = result.data;
+      var projects = matchProjectsLocal(val, tags);
+
       sessionStorage.setItem('agustinIdeaAnalysis', JSON.stringify({
         idea: val,
         tags: tags,
         source: 'api',
-        polishedIdea: apiData.idea || val,
-        steps: apiData.steps || [],
-        projects: matchProjectsLocal(val, tags).map(function(p) { return { id: p.id, title: p.title, category: p.category, type: p.type }; })
+        polishedIdea: data.polishedIdea || data.idea || '',
+        steps: data.steps || [],
+        mvp: data.mvp || [],
+        projects: projects.map(function(p) { return { id: p.id, title: p.title, category: p.category, type: p.type, slug: p.slug }; })
       }));
       var veil = document.getElementById('transition-veil');
       if (veil) veil.classList.add('show');
       setTimeout(function() {
         window.location.href = '/' + currentLocale + '/analysis';
       }, 500);
-    })
-    .catch(function() {
-      /* fallback: local analysis if API fails (CORS, network, etc.) */
-      var loadingText = cmdModalShell.querySelector('.cmdbar-modal-loading-text');
-      if (loadingText) loadingText.textContent = currentLocale === 'es' ? 'API no disponible — usando análisis local...' : 'API unavailable — using local analysis...';
+    }).catch(function(err) {
+      /* Fallback: generate local analysis if API is unreachable */
+      var msg = err.message || '';
+      var isRateLimit = msg.includes('rate limit') || msg.includes('límite');
+      var fallback = generateFallbackAnalysis(val, currentLocale);
       var projects = matchProjectsLocal(val, tags);
+
       sessionStorage.setItem('agustinIdeaAnalysis', JSON.stringify({
-        idea: val, tags, source: 'fallback',
-        projects: projects.map(function(p) { return { id: p.id, title: p.title, category: p.category, type: p.type }; }),
-        mvp: ['Define the core loop', 'Build the MVP in 2-4 weeks', 'Release to early users', 'Iterate with real data'],
-        steps: ['Validate the core hypothesis', 'Design the simplest solution', 'Ship and measure', 'Iterate or pivot']
+        idea: val,
+        tags: tags,
+        source: isRateLimit ? 'rate_limit' : 'fallback',
+        polishedIdea: fallback.idea,
+        steps: fallback.steps,
+        mvp: fallback.mvp,
+        projects: projects.map(function(p) { return { id: p.id, title: p.title, category: p.category, type: p.type, slug: p.slug }; })
       }));
+      var veil = document.getElementById('transition-veil');
+      if (veil) veil.classList.add('show');
       setTimeout(function() {
-        var veil = document.getElementById('transition-veil');
-        if (veil) veil.classList.add('show');
-        setTimeout(function() {
-          window.location.href = '/' + currentLocale + '/analysis';
-        }, 500);
-      }, 1200);
+        window.location.href = '/' + currentLocale + '/analysis';
+      }, 500);
     });
   });
 
@@ -623,6 +730,7 @@ const PROJECTS = getNodeProjects(locale);
     /* Wheel zoom */
     window.addEventListener('wheel', function(e) {
       if (window.__heroMode !== 'explore') return;
+      if (cmdModal.classList.contains('show')) return;
       if (mode === 'inspect') {
         if (nodePanel.contains(e.target) || nodeDetail.contains(e.target)) return;
         e.preventDefault();
@@ -809,14 +917,15 @@ const PROJECTS = getNodeProjects(locale);
         }).join('') + '</div>';
       }
       if (content.type === 'projects') {
-        var filters = ['All'].concat(CATEGORIES);
+        var allLabel = currentLocale === 'es' ? 'Todos' : 'All';
+        var filters = [allLabel].concat(CATEGORIES);
         return title + '<div class="node-filter" id="project-filters">' + filters.map(function(f) {
-          return '<button type="button" data-filter="'+f+'" class="'+(f === 'All' ? 'active' : '')+'">'+f+'</button>';
+          return '<button type="button" data-filter="'+f+'" class="'+(f === allLabel ? 'active' : '')+'">'+f+'</button>';
         }).join('') + '</div><div class="node-grid node-projects" id="project-grid">' + renderProjectCards(PROJECTS) + '</div>';
       }
       if (content.type === 'resources') {
         return title + '<div class="node-grid node-resources">' + content.items.map(function(r) {
-          return '<div class="node-card node-resource-card"><div class="node-card-title">'+r.title+'</div><div class="node-card-meta">'+r.author+' · '+r.type+'</div><div class="node-card-links"><a href="'+r.link+'" target="_blank" rel="noopener">Read →</a></div></div>';
+          return '<div class="node-card node-resource-card"><div class="node-card-title">'+r.title+'</div><div class="node-card-meta">'+r.author+' · '+r.type+'</div><div class="node-card-links"><a href="'+r.link+'" target="_blank" rel="noopener">'+(currentLocale==='es'?'Leer →':'Read →')+'</a></div></div>';
         }).join('') + '</div>';
       }
       if (content.type === 'testimonials') {
@@ -826,7 +935,11 @@ const PROJECTS = getNodeProjects(locale);
       }
       if (content.type === 'timeline') {
         return title + '<div class="node-timeline">' + content.items.map(function(item) {
-          return '<div class="node-timeline-item"><div class="node-timeline-date">'+item.date+'</div><div class="node-timeline-role">'+item.role+'</div><div class="node-timeline-company">'+item.company+'</div></div>';
+          var isActive = item.date.indexOf('Present') !== -1;
+          var activeClass = isActive ? ' active' : '';
+          var dot = isActive ? '<span class="node-timeline-dot" aria-hidden="true"></span>' : '';
+          var companyHtml = item.url ? '<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+item.company+'</a>' : item.company;
+          return '<div class="node-timeline-item'+activeClass+'"><div class="node-timeline-date">'+dot+item.date+'</div><div class="node-timeline-role">'+item.role+'</div><div class="node-timeline-company">'+companyHtml+'</div></div>';
         }).join('') + '</div>';
       }
       return '';
@@ -835,7 +948,7 @@ const PROJECTS = getNodeProjects(locale);
     function renderProjectCards(projects) {
       return projects.map(function(p) {
         var link = '/' + locale + '/projects/' + (p.slug || p.id) + '/';
-        var featuredBadge = p.featured ? '<span class="node-card-badge">Featured</span>' : '';
+        var featuredBadge = p.featured ? '<span class="node-card-badge">'+(currentLocale==='es'?'Destacado':'Featured')+'</span>' : '';
         var tagsHtml = p.tags.slice(0, 3).map(function(t) { return '<span class="node-card-tag">' + t + '</span>'; }).join('');
         return '<div class="node-card node-project-card" data-category="'+p.category+'">' +
           '<div class="node-card-image"><img src="'+p.image+'" alt="'+p.title+'" loading="lazy" /></div>' +
@@ -858,7 +971,8 @@ const PROJECTS = getNodeProjects(locale);
             filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             var filter = btn.dataset.filter;
-            var filtered = filter === 'All' ? PROJECTS : PROJECTS.filter(function(p) { return p.category === filter; });
+            var allLabel = currentLocale === 'es' ? 'Todos' : 'All';
+            var filtered = filter === allLabel ? PROJECTS : PROJECTS.filter(function(p) { return p.category === filter; });
             grid.innerHTML = renderProjectCards(filtered);
           });
         });
@@ -887,8 +1001,29 @@ const PROJECTS = getNodeProjects(locale);
         return '<div class="nd-section reveal-item" style="animation-delay:'+i*80+'ms"><h4>'+s.title+'</h4><p>'+s.text+'</p></div>';
       }).join('');
       ndLinks.innerHTML = (detail.links || []).map(function(l) {
+        if (l.url === '#' || l.url.indexOf('mailto:') === 0) {
+          return '<button type="button" class="node-email-btn" data-email-action>'+l.label+'</button>';
+        }
         return '<a href="'+l.url+'" target="_blank" rel="noopener">'+l.label+'</a>';
       }).join('');
+      var emailAction = ndLinks.querySelector('[data-email-action]');
+      if (emailAction) {
+        emailAction.addEventListener('click', function() {
+          var label = emailAction.textContent || '';
+          emailAction.textContent = (currentLocale === 'es' ? 'Enviando...' : 'Sending...');
+          fetch('/api/send-idea', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'contact', name: 'Portfolio Visitor', email: '', message: (currentLocale === 'es' ? 'Un visitante del portfolio hizo clic en "' + label + '" desde el nodo ' + (currentNodeKey || '') + '.' : 'A portfolio visitor clicked "' + label + '" from the ' + (currentNodeKey || '') + ' node.'), page: 'node-' + (currentNodeKey || '').toLowerCase(), language: currentLocale })
+          }).then(function(r) { return r.json(); }).then(function(res) {
+            emailAction.textContent = (currentLocale === 'es' ? 'Enviado!' : 'Sent!');
+            setTimeout(function() { emailAction.textContent = label; }, 2000);
+          }).catch(function() {
+            emailAction.textContent = (currentLocale === 'es' ? 'Error' : 'Error');
+            setTimeout(function() { emailAction.textContent = label; }, 2000);
+          });
+        });
+      }
       /* Render testimonials carousel for CLIENTS node */
       if (currentNodeKey === 'CLIENTS' && data.content && data.content.type === 'testimonials') {
         var items = data.content.items;
@@ -968,51 +1103,63 @@ const PROJECTS = getNodeProjects(locale);
     function runNodeAnalysis() {
       var text = nodeIdeaInput.value.trim();
       if (!text || !currentNodeKey) return;
+      if (text.length < 3 || text.length > 2000) return;
+      var injectionRe = /ignore\s+(all\s+)?(previous|prior|above)|disregard\s+(all\s+)?(previous|prior)|you\s+are\s+now\s+(a|an)|act\s+as\s+(a|an)\s+(different|new)|from\s+now\s+on\s+(you\s+)?(will|must|are)|pretend\s+(you\s+)?(are|to\s+be)/i;
+      if (injectionRe.test(text)) return;
+      var offTopicRe = /what\s+(model|ai|llm|gpt|claude)\s+are\s+you|who\s+(made|created|built)\s+you|write\s+(me\s+)?(a\s+)?(poem|song|story)|tell\s+me\s+(a\s+)?joke/i;
+      if (offTopicRe.test(text)) return;
       var enrichment = NODE_ENRICHMENT[currentNodeKey];
       var tags = decomposeIdea(text);
 
-      aiResultPitch.textContent = 'Analyzing...';
+      aiResultPitch.textContent = (currentLocale === 'es' ? 'Analizando...' : 'Analyzing...');
       aiResultChips.innerHTML = '';
       aiResultSteps.innerHTML = '';
       aiResult.classList.add('show');
       mode = 'result';
 
-      fetch('https://api.flowfolio.space/portfolio/idea', {
+      fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'Explorador', projectIdea: text, language: currentLocale === 'es' ? 'es' : 'en' })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(res) {
-        var apiData = res.data || res;
-        var pitch = apiData.idea || text;
-        var apiSteps = apiData.steps || [];
-
-        var components = Array.from(new Set(tags.slice(0,3).concat(enrichment.verbs.slice(0,2).map(function(v) { return v.toUpperCase(); }))));
-        aiResultChips.innerHTML = components.map(function(c,i) { return '<span class="reveal-item" style="animation-delay:'+i*60+'ms">'+c+'</span>'; }).join('');
-        aiResultSteps.innerHTML = apiSteps.map(function(s,i) { return '<li class="reveal-item" style="animation-delay:'+i*100+'ms">'+s+'</li>'; }).join('');
-
-        var subject = encodeURIComponent('Idea: ' + text.substring(0, 50));
-        var body = encodeURIComponent('Hi Agustín,\n\nI was exploring your '+currentNodeKey+' node and polished this idea:\n\n"'+pitch+'"\n\nCore components: '+components.join(', ')+'\n\nNext steps:\n'+apiSteps.map(function(s, i) { return (i+1)+'. '+s; }).join('\n')+'\n\nOriginal idea: '+text+'\n\nLet\'s talk.');
-        aiSendLink.href = 'mailto:hola@agustin.top?subject='+subject+'&body='+body;
-
-        typeText(aiResultPitch, pitch, 14);
-      })
-      .catch(function() {
-        /* fallback: local pitch if API fails */
+        body: JSON.stringify({ projectIdea: text, language: currentLocale })
+      }).then(function(res) {
+        if (res.status === 429) throw new Error('rate_limit');
+        return res.json();
+      }).then(function(result) {
+        var pitch, components, steps;
+        if (result.success && result.data) {
+          pitch = result.data.polishedIdea || result.data.idea || text;
+          components = result.data.tags || tags.slice(0, 5);
+          steps = result.data.steps || [];
+        } else {
+          throw new Error('api_error');
+        }
+        return renderNodeResult(pitch, components, steps, text, enrichment);
+      }).catch(function() {
+        /* Fallback: local generation when API unreachable */
         var lower = text.toLowerCase();
         var verbs = lower.match(/\b(connect|track|manage|share|find|match|pay|automate|build|launch|monitor|analyze|book|schedule|order|deliver|learn|teach|design|create)\b/g) || [];
         var mainVerb = verbs[0] || enrichment.verbs[0];
-        var pitch = enrichment.lens + ' product that ' + mainVerb + 's ' + lower.replace(/^(i want to|quiero|me gustaría|i would like to|i need to)\s*/i, '').replace(/\.$/, '') + '. ' + enrichment.angle;
+        var pitch = (currentLocale === 'es'
+          ? 'Una ' + enrichment.lens.toLowerCase() + ' que ' + mainVerb + ' ' + lower.replace(/^(i want to|quiero|me gustaría|i would like to|i need to)\s*/i, '').replace(/\.$/, '') + '. ' + enrichment.angle
+          : 'A ' + enrichment.lens.toLowerCase() + ' product that ' + mainVerb + 's ' + lower.replace(/^(i want to|quiero|me gustaría|i would like to|i need to)\s*/i, '').replace(/\.$/, '') + '. ' + enrichment.angle);
         var components = Array.from(new Set(tags.slice(0,3).concat(enrichment.verbs.slice(0,2).map(function(v) { return v.toUpperCase(); }))));
-        var steps = [STEP_TEMPLATES[0], 'Apply the '+currentNodeKey+' lens: '+enrichment.angle.toLowerCase(), STEP_TEMPLATES[2], STEP_TEMPLATES[3]];
-        aiResultChips.innerHTML = components.map(function(c,i) { return '<span class="reveal-item" style="animation-delay:'+i*60+'ms">'+c+'</span>'; }).join('');
-        aiResultSteps.innerHTML = steps.map(function(s,i) { return '<li class="reveal-item" style="animation-delay:'+i*100+'ms">'+s+'</li>'; }).join('');
-        var subject = encodeURIComponent('Idea: ' + text.substring(0, 50));
-        var body = encodeURIComponent('Hi Agustín,\n\nI was exploring your '+currentNodeKey+' node and polished this idea:\n\n"'+pitch+'"\n\nCore components: '+components.join(', ')+'\n\nNext steps:\n'+steps.map(function(s, i) { return (i+1)+'. '+s; }).join('\n')+'\n\nOriginal idea: '+text+'\n\nLet\'s talk.');
-        aiSendLink.href = 'mailto:hola@agustin.top?subject='+subject+'&body='+body;
-        typeText(aiResultPitch, pitch, 14);
+        var steps = currentLocale === 'es'
+          ? ['Validar la hipótesis con 5 usuarios reales', 'Apply the '+currentNodeKey+' lens: '+enrichment.angle.toLowerCase(), 'Construir MVP funcional en 2-4 semanas', 'Lanzar y medir engagement real']
+          : ['Validate the hypothesis with 5 real users', 'Apply the '+currentNodeKey+' lens: '+enrichment.angle.toLowerCase(), 'Build a functional MVP in 2-4 weeks', 'Launch and measure real engagement'];
+        renderNodeResult(pitch, components, steps, text, enrichment);
       });
+    }
+
+    /* Store last node analysis for mailprex send */
+    var _lastNodeIdea = { pitch: '', components: [], steps: [], originalText: '' };
+
+    function renderNodeResult(pitch, components, steps, originalText, enrichment) {
+      var componentsArr = Array.isArray(components) ? components : [];
+      var stepsArr = Array.isArray(steps) ? steps : [];
+      aiResultChips.innerHTML = componentsArr.map(function(c,i) { return '<span class="reveal-item" style="animation-delay:'+i*60+'ms">'+c+'</span>'; }).join('');
+      aiResultSteps.innerHTML = stepsArr.map(function(s,i) { return '<li class="reveal-item" style="animation-delay:'+i*100+'ms">'+s+'</li>'; }).join('');
+      _lastNodeIdea = { pitch: pitch, components: componentsArr, steps: stepsArr, originalText: originalText };
+      typeText(aiResultPitch, pitch, 14);
     }
 
     nodeIdeaSubmit.addEventListener('click', runNodeAnalysis);
@@ -1020,6 +1167,35 @@ const PROJECTS = getNodeProjects(locale);
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runNodeAnalysis(); }
     });
     aiNewIdea.addEventListener('click', function() { nodeIdeaInput.value = ''; nodeIdeaInput.focus(); aiResult.classList.remove('show'); mode = 'inspect'; });
+
+    /* Send idea via Mailprex */
+    aiSendLink.addEventListener('click', function() {
+      if (!_lastNodeIdea.originalText) return;
+      var origText = aiSendLink.textContent;
+      aiSendLink.textContent = (currentLocale === 'es' ? 'Enviando...' : 'Sending...');
+      aiSendLink.disabled = true;
+      fetch('/api/send-idea', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idea: _lastNodeIdea.originalText,
+          polishedIdea: _lastNodeIdea.pitch,
+          tags: _lastNodeIdea.components,
+          steps: _lastNodeIdea.steps,
+          language: currentLocale
+        })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (data.success) {
+          aiSendLink.textContent = (currentLocale === 'es' ? 'Enviado!' : 'Sent!');
+          setTimeout(function() { aiSendLink.textContent = origText; aiSendLink.disabled = false; }, 2000);
+        } else {
+          throw new Error(data.error || 'Failed');
+        }
+      }).catch(function() {
+        aiSendLink.textContent = (currentLocale === 'es' ? 'Error - reintentá' : 'Error - retry');
+        setTimeout(function() { aiSendLink.textContent = origText; aiSendLink.disabled = false; }, 2000);
+      });
+    });
 
     /* Portfolio transition */
     window.__enterPortfolio = function(targetHref) {

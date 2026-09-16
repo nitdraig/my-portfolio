@@ -2,12 +2,13 @@ import type { APIRoute } from "astro";
 import { getEnv } from "../../lib/env";
 import { checkAnalyzeRateLimit } from "../../lib/analyze/rateLimit";
 import { isSameOriginRequest } from "../../lib/contact/origin";
+import { sanitizeInput, looksLikeIdea, getRejectionMessage } from "../../lib/analyze/sanitize";
 
 export type AnalyzeResult =
   | { success: true; data: Record<string, unknown> }
   | {
       success: false;
-      error: "rate_limit" | "validation" | "auth" | "upstream" | "forbidden";
+      error: "rate_limit" | "validation" | "auth" | "upstream" | "forbidden" | "rejected";
       message?: string;
     };
 
@@ -63,26 +64,29 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  const projectIdea = typeof body.projectIdea === "string" ? body.projectIdea.trim() : "";
+  const rawIdea = typeof body.projectIdea === "string" ? body.projectIdea.trim() : "";
   const language = body.language === "en" ? "en" : "es";
 
-  if (!projectIdea || projectIdea.length < 3) {
+  // --- Sanitize and validate input ---
+  const sanitized = sanitizeInput(rawIdea);
+  if (!sanitized.ok) {
     return Response.json(
       {
         success: false,
-        error: "validation",
-        message: "projectIdea is required (min 3 chars)",
+        error: "rejected",
+        message: getRejectionMessage(sanitized, language),
       } satisfies AnalyzeResult,
       { status: 400 },
     );
   }
 
-  if (projectIdea.length > 2000) {
+  // --- Content filter: must look like a project idea ---
+  if (!looksLikeIdea(sanitized.clean)) {
     return Response.json(
       {
         success: false,
-        error: "validation",
-        message: "projectIdea too long (max 2000 chars)",
+        error: "rejected",
+        message: getRejectionMessage({ ok: false, reason: "off_topic" }, language),
       } satisfies AnalyzeResult,
       { status: 400 },
     );
@@ -104,7 +108,7 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  // --- Forward to upstream API ---
+  // --- Forward sanitized input to upstream API ---
   try {
     const upstreamRes = await fetch(upstreamUrl, {
       method: "POST",
@@ -114,7 +118,7 @@ export const POST: APIRoute = async ({ request }) => {
       },
       body: JSON.stringify({
         name: "Explorador",
-        projectIdea,
+        projectIdea: sanitized.clean,
         language,
       }),
       signal: AbortSignal.timeout(15000),

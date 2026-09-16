@@ -104,7 +104,7 @@ const showcase = featured.length >= 4
   <div class="connect-row">
     <div class="connect-cta">{n.connectCta}</div>
     <div class="connect-links">
-      <a href="mailto:me@agustin.top">me@agustin.top</a>
+      <button type="button" class="connect-email-btn" id="connect-email-btn">me@agustin.top</button>
       <a href="https://www.linkedin.com/in/avellaneda-agustin/" target="_blank" rel="noopener">LinkedIn</a>
       <a href="https://github.com/nitdraig" target="_blank" rel="noopener">GitHub</a>
     </div>
@@ -152,4 +152,28 @@ const showcase = featured.length >= 4
   .connect-links { display: flex; flex-direction: column; gap: 10px; font-family: var(--font-mono); font-size: 13px; }
   .connect-links a { color: var(--color-text-dim); border-bottom: 1px solid transparent; }
   .connect-links a:hover { color: var(--color-text); border-color: var(--color-text-faint); }
+  .connect-email-btn { background: none; border: none; font-family: var(--font-mono); font-size: 13px; color: var(--color-text-dim); cursor: pointer; padding: 0; text-align: left; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
+  .connect-email-btn:hover { color: var(--color-text); border-color: var(--color-text-faint); }
 </style>
+
+<script is:inline define:vars={{ locale }}>
+(function() {
+  var btn = document.getElementById('connect-email-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    var orig = btn.textContent;
+    btn.textContent = locale === 'es' ? 'Enviando...' : 'Sending...';
+    fetch('/api/send-idea', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'contact', name: 'Portfolio Visitor', email: '', message: locale === 'es' ? 'Un visitante del portfolio quiere contactarte desde la sección Conectemos.' : 'A portfolio visitor wants to contact you from the Connect section.', page: 'connect', language: locale })
+    }).then(function(r) { return r.json(); }).then(function(res) {
+      btn.textContent = locale === 'es' ? 'Enviado!' : 'Sent!';
+      setTimeout(function() { btn.textContent = orig; }, 2000);
+    }).catch(function() {
+      btn.textContent = locale === 'es' ? 'Error' : 'Error';
+      setTimeout(function() { btn.textContent = orig; }, 2000);
+    });
+  });
+})();
+</script>
