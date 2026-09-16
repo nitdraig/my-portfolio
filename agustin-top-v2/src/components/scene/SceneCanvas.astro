@@ -1,0 +1,189 @@
+---
+/**
+ * Knowledge-graph AI Core shell.
+ * Three.js is mounted from systemHome.ts (reliable single entry).
+ */
+interface Props {
+  mode?: "chaos" | "listen" | "structure";
+  variant?: "hero" | "panel";
+  class?: string;
+  eager?: boolean;
+}
+
+const {
+  mode = "chaos",
+  variant = "hero",
+  class: className = "",
+  eager = true,
+} = Astro.props;
+
+const fallbackNodes = ["AI", "CODE", "PRODUCT", "MVP", "PROJECTS", "SYSTEMS"];
+---
+
+<div
+  class:list={[
+    "scene-root",
+    variant === "hero" ? "is-hero" : "is-panel",
+    className,
+  ]}
+  data-scene-root
+  data-scene-mode={mode}
+  data-scene-eager={eager ? "true" : "false"}
+  aria-hidden="true"
+  style={variant === "hero" ? "height:100vh;" : undefined}
+>
+  <div class="scene-fallback" data-scene-fallback>
+    <div class="scene-fallback-spin">
+      <svg class="scene-graph-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <radialGradient id="kg-bg" cx="50%" cy="45%" r="55%">
+            <stop offset="0%" stop-color="rgba(232,255,71,0.14)" />
+            <stop offset="100%" stop-color="rgba(10,10,11,0)" />
+          </radialGradient>
+        </defs>
+        <rect width="100" height="100" fill="url(#kg-bg)" />
+        {
+          fallbackNodes.map((_, i) => {
+            const a = (i / fallbackNodes.length) * Math.PI * 2 - Math.PI / 2;
+            const x1 = 50 + Math.cos(a) * 30;
+            const y1 = 48 + Math.sin(a) * 24;
+            const b = ((i + 1) / fallbackNodes.length) * Math.PI * 2 - Math.PI / 2;
+            const x2 = 50 + Math.cos(b) * 30;
+            const y2 = 48 + Math.sin(b) * 24;
+            return (
+              <line
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="rgba(232,255,71,0.55)"
+                stroke-width="0.65"
+              />
+            );
+          })
+        }
+        {
+          fallbackNodes.map((label, i) => {
+            const a = (i / fallbackNodes.length) * Math.PI * 2 - Math.PI / 2;
+            const x = 50 + Math.cos(a) * 30;
+            const y = 48 + Math.sin(a) * 24;
+            return (
+              <g class="scene-fg-node" style={`--i:${i}`}>
+                <circle cx={x} cy={y} r="2.6" fill="#e8ff47" fill-opacity="0.95" />
+                <circle cx={x} cy={y} r="5.5" fill="none" stroke="rgba(232,255,71,0.25)" stroke-width="0.5" />
+                <text
+                  x={x}
+                  y={y - 4.8}
+                  text-anchor="middle"
+                  fill="rgba(238,238,236,0.85)"
+                  font-size="3.2"
+                  font-family="IBM Plex Mono, monospace"
+                  letter-spacing="0.08em"
+                >
+                  {label}
+                </text>
+              </g>
+            );
+          })
+        }
+      </svg>
+    </div>
+  </div>
+
+  <canvas
+    class="scene-canvas"
+    data-scene-canvas
+    style="opacity:1;z-index:2;"
+  ></canvas>
+</div>
+
+<style>
+  .scene-root {
+    position: relative;
+    overflow: hidden;
+    pointer-events: auto;
+  }
+
+  .scene-root.is-hero {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 0;
+  }
+
+  .scene-root.is-panel {
+    aspect-ratio: 16 / 10;
+    width: 100%;
+  }
+
+  .scene-fallback {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      radial-gradient(ellipse 70% 55% at 58% 42%, rgba(232, 255, 71, 0.08), transparent 55%),
+      #0a0a0b;
+    transition: opacity 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scene-fallback-spin {
+    width: min(78vh, 720px);
+    height: min(78vh, 720px);
+    animation: kg-orbit 22s linear infinite;
+  }
+
+  .scene-fallback.is-replaced {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .scene-graph-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .scene-fg-node {
+    animation: kg-breathe 2.8s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.22s);
+  }
+
+  .scene-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+  }
+
+  .scene-canvas:active {
+    cursor: grabbing;
+  }
+
+  @keyframes kg-orbit {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes kg-breathe {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scene-fallback-spin {
+      animation: kg-orbit 60s linear infinite;
+    }
+  }
+</style>

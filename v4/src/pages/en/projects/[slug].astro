@@ -1,0 +1,66 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Navbar from "../../../components/Navbar.astro";
+import Footer from "../../../components/Footer.astro";
+import ParticleBackground from "../../../components/ParticleBackground.astro";
+import ProjectHero from "../../../components/project/ProjectHero.astro";
+import ProjectDetails from "../../../components/project/ProjectDetails.astro";
+import RelatedProjects from "../../../components/project/RelatedProjects.astro";
+import { projects } from "../../../data/projects";
+
+export function getStaticPaths() {
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const locale = "en";
+const { project } = Astro.props;
+---
+
+<BaseLayout
+  locale={locale}
+  title={`${project.title[locale]} | Agustín Avellaneda`}
+  description={project.shortDescription[locale]}
+  image={`https://www.agustin.top${project.image}`}
+  canonicalPath={`projects/${project.slug}`}
+>
+  <Navbar locale={locale} />
+  <ParticleBackground />
+  <main class="project-page">
+    <ProjectHero locale={locale} project={project} />
+    <ProjectDetails locale={locale} project={project} />
+    <RelatedProjects locale={locale} project={project} />
+  </main>
+  <Footer locale={locale} />
+</BaseLayout>
+
+<script is:inline>
+(function() {
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reducedMotion) return;
+  var sections = document.querySelectorAll('.project-page > section');
+  function onScroll() {
+    var sy = window.scrollY;
+    sections.forEach(function(sec, i) {
+      var rect = sec.getBoundingClientRect();
+      var raw = (rect.top + sy) * 0.02 * (i % 2 === 0 ? 1 : -1);
+      var offset = Math.max(-12, Math.min(12, raw));
+      sec.style.transform = 'translateY(' + offset + 'px)';
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+<style is:global>
+  .project-page > section {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.1s linear;
+  }
+</style>

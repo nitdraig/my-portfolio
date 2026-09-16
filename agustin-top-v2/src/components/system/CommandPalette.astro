@@ -1,0 +1,193 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].system;
+const prefix = `/${locale}`;
+
+const items = t.commandItems.map((item) => ({
+  ...item,
+  href: item.href.startsWith("#") ? `${prefix}/${item.href}` : item.href,
+  tag: ((item as { tag?: string }).tag ?? item.id).toUpperCase(),
+}));
+---
+
+<div
+  id="command-palette"
+  class="cmdk-overlay"
+  data-command-palette
+  hidden
+>
+  <button
+    type="button"
+    class="cmdk-backdrop"
+    data-command-backdrop
+    aria-label="Close"
+  ></button>
+  <div
+    class="cmdk-box"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="command-palette-title"
+  >
+    <p id="command-palette-title" class="sr-only">{t.commandTitle}</p>
+    <input
+      type="search"
+      class="cmdk-input"
+      placeholder={locale === "es" ? "Escribí un comando..." : "Type a command..."}
+      data-command-filter
+      autocomplete="off"
+    />
+    <div class="cmdk-list" data-command-list role="listbox">
+      {
+        items.map((item) => (
+          <a
+            href={item.href}
+            class="cmdk-item"
+            data-command-item
+            data-label={item.label.toLowerCase()}
+            role="option"
+          >
+            <span>{item.label}</span>
+            <span class="tag">{item.tag}</span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<script>
+  const palette = document.querySelector("[data-command-palette]");
+  const openBtn = document.getElementById("command-open-btn");
+  const backdrop = document.querySelector("[data-command-backdrop]");
+  const filter = document.querySelector("[data-command-filter]");
+  const items = () =>
+    Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-command-item]"));
+
+  function openPalette() {
+    if (!(palette instanceof HTMLElement)) return;
+    palette.hidden = false;
+    if (filter instanceof HTMLInputElement) {
+      filter.value = "";
+      filterItems("");
+      filter.focus();
+    }
+  }
+
+  function closePalette() {
+    if (!(palette instanceof HTMLElement)) return;
+    palette.hidden = true;
+  }
+
+  function filterItems(q: string) {
+    const query = q.trim().toLowerCase();
+    items().forEach((el) => {
+      const label = el.dataset.label ?? "";
+      el.classList.toggle("hidden", Boolean(query && !label.includes(query)));
+    });
+  }
+
+  openBtn?.addEventListener("click", () => openPalette());
+  backdrop?.addEventListener("click", () => closePalette());
+
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      if (palette instanceof HTMLElement && !palette.hidden) closePalette();
+      else openPalette();
+    }
+    if (e.key === "Escape") closePalette();
+  });
+
+  filter?.addEventListener("input", (e) => {
+    if (e.target instanceof HTMLInputElement) filterItems(e.target.value);
+  });
+
+  items().forEach((el) => {
+    el.addEventListener("click", () => closePalette());
+  });
+</script>
+
+<style>
+  .cmdk-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 14vh;
+  }
+
+  .cmdk-overlay[hidden] {
+    display: none;
+  }
+
+  .cmdk-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(6, 6, 7, 0.7);
+    backdrop-filter: blur(4px);
+  }
+
+  .cmdk-box {
+    position: relative;
+    width: min(560px, 90vw);
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  }
+
+  .cmdk-input {
+    width: 100%;
+    padding: 18px 20px;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cmdk-input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .cmdk-list {
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .cmdk-item {
+    padding: 13px 20px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+
+  .cmdk-item:hover {
+    background: rgba(232, 255, 71, 0.08);
+    color: var(--text);
+  }
+
+  .cmdk-item.hidden {
+    display: none;
+  }
+
+  .cmdk-item .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+</style>

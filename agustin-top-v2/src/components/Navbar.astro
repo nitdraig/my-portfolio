@@ -1,0 +1,236 @@
+---
+import type { Locale } from "../i18n/ui";
+import { ui } from "../i18n/ui";
+import { switchLocalePath } from "../i18n/utils";
+
+interface Props {
+  locale: Locale;
+  /** Home explore stage: difference blend nav over the hero. */
+  explore?: boolean;
+}
+
+const { locale, explore = false } = Astro.props;
+const t = ui[locale];
+const prefix = `/${locale}`;
+const esPath = switchLocalePath(Astro.url, "es");
+const enPath = switchLocalePath(Astro.url, "en");
+
+const links = [
+  { href: `${prefix}/#proof`, label: t.nav.work, hash: "#proof" },
+  { href: `${prefix}/#understand`, label: t.nav.ai, hash: "#understand" },
+  { href: `${prefix}/about`, label: t.nav.about, hash: null },
+];
+---
+
+<header
+  class:list={["site-header", explore && "is-explore"]}
+  data-site-header
+  data-scrolled="false"
+  data-explore={explore ? "true" : "false"}
+>
+  <a href={`${prefix}/`} class="logo focus-ring">
+    agustin.top
+  </a>
+
+  <nav class="links" aria-label={locale === "es" ? "Principal" : "Main"}>
+    {
+      links.map((link) => (
+        <a href={link.href} data-nav={link.hash ?? undefined} class="focus-ring">
+          {link.label}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="nav-right">
+    <a
+      href={locale === "en" ? esPath : enPath}
+      class="lang focus-ring"
+      aria-label={locale === "en" ? "Español" : "English"}
+    >
+      {locale === "en" ? "ES" : "EN"}
+    </a>
+    <button
+      type="button"
+      id="command-open-btn"
+      class="kbd focus-ring"
+      aria-label={t.nav.commandHint}
+    >
+      ⌘K
+    </button>
+    <div class="mobile-wrap md-only" id="mobile-nav-root">
+      <button
+        type="button"
+        id="mobile-menu-btn"
+        class="kbd focus-ring"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label={t.nav.menuToggle}
+      >
+        {t.nav.menu}
+      </button>
+      <div id="mobile-menu" class="mobile-menu" hidden role="menu">
+        {
+          links.map((link) => (
+            <a href={link.href} class="mobile-nav-link" role="menuitem">
+              {link.label}
+            </a>
+          ))
+        }
+        <a href={`${prefix}/#connect`} class="mobile-nav-link accent" role="menuitem">
+          {t.nav.contact}
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById("mobile-menu-btn");
+  const menu = document.getElementById("mobile-menu");
+
+  function setOpen(open: boolean) {
+    if (!btn || !menu) return;
+    menu.hidden = !open;
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  btn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    setOpen(btn.getAttribute("aria-expanded") !== "true");
+  });
+
+  document.querySelectorAll(".mobile-nav-link").forEach((link) => {
+    link.addEventListener("click", () => setOpen(false));
+  });
+
+  document.addEventListener("click", () => setOpen(false));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setOpen(false);
+  });
+</script>
+
+<style>
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 32px;
+  }
+
+  .site-header.is-explore {
+    mix-blend-mode: difference;
+  }
+
+  .logo {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+
+  .links {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    font-size: 13px;
+    font-family: var(--mono);
+  }
+
+  .links a {
+    opacity: 0.75;
+    transition: opacity 0.2s;
+  }
+
+  .links a:hover {
+    opacity: 1;
+  }
+
+  .nav-right {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-size: 13px;
+    font-family: var(--mono);
+    opacity: 0.9;
+  }
+
+  .lang {
+    opacity: 0.75;
+  }
+
+  .lang:hover {
+    opacity: 1;
+  }
+
+  .kbd {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-family: var(--mono);
+    position: relative;
+  }
+
+  .kbd::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 5px;
+    box-shadow: 0 0 14px rgba(232, 255, 71, 0);
+    transition: box-shadow 0.3s;
+  }
+
+  .kbd:hover::after {
+    box-shadow: 0 0 14px rgba(232, 255, 71, 0.45);
+  }
+
+  .mobile-wrap {
+    position: relative;
+    display: none;
+  }
+
+  .mobile-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 12rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg-panel);
+    padding: 8px 0;
+    mix-blend-mode: normal;
+  }
+
+  .mobile-nav-link {
+    display: block;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .mobile-nav-link:hover,
+  .mobile-nav-link.accent {
+    color: var(--accent);
+  }
+
+  @media (max-width: 720px) {
+    .links {
+      display: none;
+    }
+
+    .mobile-wrap {
+      display: block;
+    }
+
+    .site-header {
+      padding: 18px 20px;
+    }
+  }
+</style>

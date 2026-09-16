@@ -1,0 +1,112 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { processSteps } from "../../data/process";
+
+interface Props {
+  locale: Locale;
+  /** Show all steps (process page) or a short preview (home). */
+  full?: boolean;
+}
+
+const { locale, full = false } = Astro.props;
+const t = ui[locale].processPage;
+const prefix = `/${locale}`;
+const steps = full ? processSteps : processSteps.slice(0, 5);
+---
+
+<section
+  id="process"
+  class:list={[
+    "border-t border-line px-5 md:px-8",
+    full ? "bg-ink py-16 md:py-24" : "bg-ink-elevated py-20 md:py-28",
+  ]}
+  aria-labelledby="process-heading"
+>
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal mb-12 max-w-2xl md:mb-16">
+      <h2
+        id="process-heading"
+        class="font-display text-3xl font-semibold tracking-tight text-paper md:text-4xl"
+      >
+        {full ? t.title : t.previewTitle}
+      </h2>
+      <p class="mt-4 text-lg text-fog">
+        {full ? t.subtitle : t.previewSubtitle}
+      </p>
+    </div>
+
+    <ol class="reveal space-y-0" data-reveal-stagger>
+      {
+        steps.map((step) => (
+          <li class="reveal grid gap-4 border-t border-line py-8 md:grid-cols-[5rem_1fr] md:gap-8">
+            <span class="font-display text-2xl font-semibold text-accent/90">
+              {step.number}
+            </span>
+            <div>
+              <h3 class="font-display text-xl font-semibold text-paper md:text-2xl">
+                {step.title[locale]}
+              </h3>
+              {
+                full ? (
+                  <dl class="mt-6 grid gap-6 sm:grid-cols-2">
+                    <div>
+                      <dt class="text-xs font-medium tracking-wide text-accent uppercase">
+                        {t.whatHappens}
+                      </dt>
+                      <dd class="mt-2 text-sm leading-relaxed text-fog">
+                        {step.whatHappens[locale]}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt class="text-xs font-medium tracking-wide text-accent uppercase">
+                        {t.clientReceives}
+                      </dt>
+                      <dd class="mt-2 text-sm leading-relaxed text-fog">
+                        {step.clientReceives[locale]}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt class="text-xs font-medium tracking-wide text-accent uppercase">
+                        {t.decisions}
+                      </dt>
+                      <dd class="mt-2 text-sm leading-relaxed text-fog">
+                        {step.decisions[locale]}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt class="text-xs font-medium tracking-wide text-accent uppercase">
+                        {t.outcome}
+                      </dt>
+                      <dd class="mt-2 text-sm leading-relaxed text-fog">
+                        {step.outcome[locale]}
+                      </dd>
+                    </div>
+                  </dl>
+                ) : (
+                  <p class="mt-3 max-w-2xl text-sm leading-relaxed text-fog md:text-base">
+                    {step.whatHappens[locale]}
+                  </p>
+                )
+              }
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    {
+      !full && (
+        <div class="reveal mt-10">
+          <a
+            href={`${prefix}/process`}
+            class="inline-flex items-center gap-2 text-sm font-semibold text-accent transition-colors hover:text-accent-dim focus-ring rounded-sm"
+          >
+            {t.viewAll}
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      )
+    }
+  </div>
+</section>

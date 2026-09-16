@@ -1,0 +1,97 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].system;
+const flow = ["IDEA", "THINK", "MVP", "PRODUCT", "LAUNCH"];
+---
+
+<section class="narrative" id="understand" data-section="understand" data-understand>
+  <div class="sect-head">
+    <span class="sect-num">{t.sectionUnderstand}</span>
+    <h2 class="sect-title">{t.understandTitle}</h2>
+  </div>
+  <p class="sect-sub">{t.understandBody}</p>
+
+  <div class="flow-mini" aria-hidden="true">
+    {
+      flow.map((node, i) => (
+        <>
+          <span class="node">{node}</span>
+          {i < flow.length - 1 && <span class="arrow">→</span>}
+        </>
+      ))
+    }
+  </div>
+
+  <div
+    class="mt-10 grid gap-10 lg:grid-cols-2"
+    data-understand-panel
+    data-has-result="false"
+  >
+    <div>
+      <p class="text-sm text-[var(--text-dim)]" data-understand-empty>
+        {t.understandEmpty}
+      </p>
+      <div class="hidden space-y-4" data-understand-result>
+        <p class="font-mono text-[11px] tracking-wide text-[var(--accent)] uppercase">
+          {t.conceptsLabel}
+        </p>
+        <ul class="flex flex-wrap gap-2" data-concept-list></ul>
+        <p class="text-sm text-[var(--text-dim)]" data-product-hint></p>
+        <p class="text-xs text-[var(--text-faint)]">
+          <span class="uppercase tracking-wide">{t.noteLabel}:</span>
+          {" "}
+          <span data-note-text></span>
+        </p>
+      </div>
+    </div>
+    <div>
+      <p class="font-mono text-[11.5px] text-[var(--text-faint)]">
+        <span data-similar-count>0</span> {t.similarTitle}
+      </p>
+      <ul class="mt-3 space-y-2" data-similar-list aria-live="polite"></ul>
+      <p class="mt-3 hidden text-sm text-[var(--text-dim)]" data-similar-empty>
+        {t.similarEmpty}
+      </p>
+    </div>
+  </div>
+</section>
+
+<template id="tpl-concept-chip">
+  <li>
+    <span
+      class="inline-flex items-center gap-2 rounded-full border border-[var(--line)] px-2.5 py-1 font-mono text-xs text-[var(--text-dim)]"
+    >
+      <span data-concept-label></span>
+      <span class="text-[var(--text-faint)]" data-concept-source></span>
+    </span>
+  </li>
+</template>
+
+<template id="tpl-similar-item">
+  <li>
+    <a
+      class="flex justify-between gap-3 border-b border-[var(--line)] py-2.5 text-sm text-[var(--text-dim)] transition-colors hover:text-[var(--text)] focus-ring"
+      data-similar-link
+    >
+      <span data-similar-title></span>
+      <span aria-hidden="true">→</span>
+    </a>
+  </li>
+</template>
+
+<script define:vars={{ locale, labels: { provided: t.providedLabel, inferred: t.inferredLabel, view: t.viewProject } }}>
+  const root = document.querySelector("[data-understand]");
+  if (root instanceof HTMLElement) {
+    root.dataset.locale = locale;
+    root.dataset.labelProvided = labels.provided;
+    root.dataset.labelInferred = labels.inferred;
+    root.dataset.labelView = labels.view;
+  }
+</script>

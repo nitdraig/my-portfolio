@@ -1,0 +1,20 @@
+---
+export const prerender = true;
+const target = "/es/#think";
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <link rel="canonical" href="https://www.agustin.top/es/" />
+    <title>Redirecting…</title>
+    <script is:inline define:vars={{ target }}>
+      location.replace(target);
+    </script>
+  </head>
+  <body>
+    <p><a href={target}>Continue</a></p>
+  </body>
+</html>

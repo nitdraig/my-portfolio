@@ -1,0 +1,49 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { person } from "../../data/person";
+import ContactSection from "./ContactSection.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].system;
+---
+
+<section class="narrative" id="connect" data-section="connect" style="padding-bottom: 40px;">
+  <div class="sect-head">
+    <span class="sect-num">{t.sectionConnect}</span>
+    <h2 class="sect-title">{t.connectTitle}</h2>
+  </div>
+  <div class="connect-row">
+    <div class="connect-cta">{t.connectCta}</div>
+    <div class="connect-links font-mono text-[13px]">
+      <a
+        href={`mailto:${person.email}`}
+        class="block text-[var(--text-dim)] hover:text-[var(--text)] focus-ring"
+      >
+        {person.email}
+      </a>
+      <a
+        href={person.sameAs[1]}
+        class="mt-2 block text-[var(--text-dim)] hover:text-[var(--text)] focus-ring"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        LinkedIn
+      </a>
+      <a
+        href={person.sameAs[0]}
+        class="mt-2 block text-[var(--text-dim)] hover:text-[var(--text)] focus-ring"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<ContactSection locale={locale} embedded />

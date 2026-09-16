@@ -1,0 +1,75 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { person } from "../../data/person";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].system;
+const chips = [...person.systemChips];
+---
+
+<div
+  class="system-status mx-auto flex max-w-2xl flex-wrap items-center justify-center gap-x-4 gap-y-2"
+  data-system-status
+  data-status="idle"
+  data-label-ready={t.statusReady}
+  data-label-thinking={t.statusThinking}
+  data-label-complete={t.statusComplete}
+  aria-live="polite"
+>
+  <span
+    class="status-chip inline-flex items-center gap-2 text-[11px] tracking-[0.16em] text-white/45 uppercase"
+    data-status-primary
+  >
+    <span
+      class="status-dot h-1.5 w-1.5 rounded-full bg-[#e8ff47]"
+      data-status-dot
+      aria-hidden="true"
+    ></span>
+    <span data-status-label>{t.statusReady}</span>
+  </span>
+  {
+    chips.slice(1).map((chip) => (
+      <span class="text-[11px] tracking-[0.14em] text-white/30 uppercase" data-static-chip>
+        {chip}
+      </span>
+    ))
+  }
+</div>
+
+<style>
+  [data-system-status][data-status="thinking"] [data-status-dot] {
+    animation: status-pulse 1s ease-in-out infinite;
+  }
+
+  [data-system-status][data-status="thinking"] [data-status-label],
+  [data-system-status][data-status="complete"] [data-status-label] {
+    color: rgba(232, 255, 71, 0.9);
+  }
+
+  [data-system-status][data-status="thinking"] [data-static-chip] {
+    opacity: 0.35;
+  }
+
+  @keyframes status-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.35);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-system-status][data-status="thinking"] [data-status-dot] {
+      animation: none;
+    }
+  }
+</style>

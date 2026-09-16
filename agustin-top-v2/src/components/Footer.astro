@@ -1,0 +1,106 @@
+---
+import type { Locale } from "../i18n/ui";
+import { ui } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+  /** Compact bar matching root index.html */
+  compact?: boolean;
+}
+
+const { locale, compact = false } = Astro.props;
+const t = ui[locale].footer;
+const prefix = `/${locale}`;
+
+const links = [
+  { href: `${prefix}/work`, label: ui[locale].nav.work },
+  { href: `${prefix}/process`, label: ui[locale].nav.process },
+  { href: `${prefix}/about`, label: ui[locale].nav.about },
+  { href: `${prefix}/resources`, label: ui[locale].nav.resources },
+  { href: `${prefix}/contact`, label: ui[locale].nav.contact },
+];
+
+const socials = [
+  { label: "GitHub", url: "https://github.com/nitdraig" },
+  { label: "LinkedIn", url: "https://www.linkedin.com/in/avellaneda-agustin/" },
+  { label: "Email", url: "mailto:me@agustin.top" },
+];
+---
+
+{
+  compact ? (
+    <footer class="site-footer-compact">
+      <span>agustin.top</span>
+      <span>© 2026</span>
+    </footer>
+  ) : (
+    <footer class="border-t border-line bg-ink px-5 py-14 md:px-8">
+      <div class="mx-auto max-w-6xl">
+        <div class="grid gap-10 md:grid-cols-[1.4fr_1fr]">
+          <div>
+            <p class="font-display text-2xl font-semibold text-paper">{t.name}</p>
+            <p class="mt-3 max-w-md text-sm leading-relaxed text-fog">{t.tagline}</p>
+            <div class="mt-6 flex gap-3">
+              {socials.map((social) => (
+                <a
+                  href={social.url}
+                  target={social.url.startsWith("mailto:") ? undefined : "_blank"}
+                  rel={
+                    social.url.startsWith("mailto:")
+                      ? undefined
+                      : "noopener noreferrer"
+                  }
+                  aria-label={social.label}
+                  class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-line text-paper transition-colors hover:border-mist/40 hover:bg-ink-soft focus-ring"
+                >
+                  {social.label === "GitHub" && (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                  )}
+                  {social.label === "LinkedIn" && (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                  )}
+                  {social.label === "Email" && (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  )}
+                </a>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p class="text-xs font-medium tracking-[0.14em] text-fog uppercase">{t.linksLabel}</p>
+            <ul class="mt-4 space-y-2">
+              {links.map((link) => (
+                <li>
+                  <a href={link.href} class="text-sm text-mist hover:text-accent focus-ring rounded-sm">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p class="mt-12 border-t border-line pt-6 text-xs text-fog">{t.copyright}</p>
+      </div>
+    </footer>
+  )
+}
+
+<style>
+  .site-footer-compact {
+    position: relative;
+    z-index: 1;
+    padding: 24px 32px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  @media (max-width: 720px) {
+    .site-footer-compact {
+      padding: 20px;
+    }
+  }
+</style>

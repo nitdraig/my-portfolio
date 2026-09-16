@@ -1,0 +1,40 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
+import AboutSection from "../../components/sections/AboutSection.astro";
+import ServicesSection from "../../components/sections/ServicesSection.astro";
+import AiMultiplierSection from "../../components/sections/AiMultiplierSection.astro";
+import { ui } from "../../i18n/ui";
+import { person } from "../../data/person";
+
+const locale = "es" as const;
+const t = ui[locale].about;
+---
+
+<BaseLayout
+  locale={locale}
+  title={`${t.pageTitle} | Agustín Avellaneda`}
+  description={t.pageIntro}
+  canonicalPath="about"
+>
+  <Navbar locale={locale} />
+  <main id="main-content" class="pt-16">
+    <header class="border-b border-line px-5 py-14 md:px-8 md:py-20">
+      <div class="mx-auto max-w-6xl">
+        <h1 class="font-display text-4xl font-semibold tracking-tight text-paper md:text-5xl">
+          {t.pageTitle}
+        </h1>
+        <p class="mt-6 max-w-2xl text-lg leading-relaxed text-fog">{t.pageIntro}</p>
+        <p class="mt-4 max-w-2xl text-base text-mist/80">{person.whatHeDoes.es}</p>
+        <p class="mt-2 text-sm text-fog">{person.location.label.es}</p>
+      </div>
+    </header>
+    <AboutSection locale={locale} />
+    <ServicesSection locale={locale} />
+    <AiMultiplierSection locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</BaseLayout>

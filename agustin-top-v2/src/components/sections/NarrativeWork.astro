@@ -1,0 +1,49 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { person } from "../../data/person";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].system;
+
+const copy: Record<string, { es: string; en: string }> = {
+  ai: {
+    es: "Integración de modelos y agentes donde resuelven un problema concreto, no como feature decorativa.",
+    en: "Model and agent integration where they solve a concrete problem — not as decoration.",
+  },
+  fullstack: {
+    es: "De la base de datos a la interfaz, con foco en performance y mantenibilidad.",
+    en: "From database to interface, with focus on performance and maintainability.",
+  },
+  product: {
+    es: "Definición de alcance, priorización y trade-offs con visión de negocio.",
+    en: "Scope definition, prioritization, and trade-offs with business vision.",
+  },
+  pm: {
+    es: "Ejecución end-to-end: de la idea al roadmap, sin perder velocidad.",
+    en: "End-to-end execution: from idea to roadmap without losing speed.",
+  },
+};
+---
+
+<section class="narrative" id="work" data-section="work">
+  <div class="sect-head">
+    <span class="sect-num">{t.sectionWork}</span>
+    <h2 class="sect-title">{t.workTitle}</h2>
+  </div>
+
+  <div class="pillars">
+    {
+      person.capabilities.map((cap) => (
+        <div class="pillar">
+          <div class="pt">{cap.label[locale]}</div>
+          <div class="pd">{copy[cap.id]?.[locale] ?? ""}</div>
+        </div>
+      ))
+    }
+  </div>
+</section>

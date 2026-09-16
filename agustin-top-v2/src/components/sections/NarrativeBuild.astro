@@ -1,0 +1,32 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { narrativeBuildSteps } from "../../data/narrative";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].system;
+---
+
+<section class="narrative" id="build" data-section="build">
+  <div class="sect-head">
+    <span class="sect-num">{t.sectionBuild}</span>
+    <h2 class="sect-title">{t.buildTitle}</h2>
+  </div>
+  <p class="sect-sub">{t.buildSubtitle}</p>
+
+  <div class="pipeline">
+    {
+      narrativeBuildSteps.map((step, i) => (
+        <div class="stage">
+          <div class="n">{String(i + 1).padStart(2, "0")}</div>
+          <div class="t">{step.label[locale]}</div>
+          <div class="d">{step.detail[locale]}</div>
+        </div>
+      ))
+    }
+  </div>
+</section>

@@ -1,0 +1,13 @@
+---
+export const prerender = true;
+
+import { projects } from "../../../data/projects";
+
+export function getStaticPaths() {
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+  }));
+}
+
+return Astro.redirect(`/es/work/${Astro.params.slug}`, 301);
+---

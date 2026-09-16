@@ -1,0 +1,63 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { person, services } from "../../data/person";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].positioning;
+const servicesUi = ui[locale].services;
+---
+
+<section
+  id="positioning"
+  class="border-t border-line bg-ink px-5 py-20 md:px-8 md:py-28"
+  aria-labelledby="positioning-heading"
+>
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+      <div>
+        <h2
+          id="positioning-heading"
+          class="font-display text-3xl font-semibold tracking-tight text-paper md:text-4xl"
+        >
+          {t.title}
+        </h2>
+        <p class="mt-6 max-w-2xl text-lg leading-relaxed text-fog">
+          {t.body}
+        </p>
+        <p class="mt-4 max-w-2xl text-base leading-relaxed text-mist/80">
+          {person.positioning[locale]}
+        </p>
+      </div>
+      <aside class="border-l border-line pl-0 lg:pl-10">
+        <h3 class="font-display text-sm font-medium tracking-[0.15em] text-accent uppercase">
+          {t.forWhomTitle}
+        </h3>
+        <p class="mt-4 text-base leading-relaxed text-fog">{t.forWhom}</p>
+      </aside>
+    </div>
+
+    <div class="reveal mt-16 grid gap-8 md:grid-cols-3">
+      {
+        services.map((service, i) => (
+          <article class="border-t border-line pt-6">
+            <p class="font-display text-xs text-fog">
+              {String(i + 1).padStart(2, "0")}
+            </p>
+            <h3 class="font-display mt-3 text-xl font-semibold text-paper">
+              {service.title[locale]}
+            </h3>
+            <p class="mt-3 text-sm leading-relaxed text-fog">
+              {service.description[locale]}
+            </p>
+          </article>
+        ))
+      }
+    </div>
+    <p class="sr-only">{servicesUi.subtitle}</p>
+  </div>
+</section>

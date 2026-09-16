@@ -1,0 +1,117 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Footer from "../../components/Footer.astro";
+import { TIMELINE, SKILLS, BIO, APPROACH } from "../../data/experience";
+
+const locale = "en";
+---
+
+<BaseLayout locale={locale} title="About — Agustín Avellaneda" canonicalPath="/about">
+  <main>
+    <section class="hero">
+      <div class="hero-label">ABOUT</div>
+      <h1 class="hero-title">Agustín Avellaneda</h1>
+      <p class="hero-role">Independent Product Engineer</p>
+      <p class="hero-bio">{BIO[locale]}</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="mailto:me@agustin.top">Get in touch</a>
+        <a class="btn-secondary" href={`/${locale}/#proof`}>View work</a>
+      </div>
+    </section>
+
+    <section class="approach-section">
+      <div class="section-label">HOW I THINK</div>
+      <div class="approach-grid">
+        {APPROACH[locale].map((item: any, i: number) => (
+          <div class="approach-card reveal" style={{ animationDelay: `${i * 100}ms` }}>
+            <div class="approach-title">{item.title}</div>
+            <div class="approach-text">{item.text}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="timeline-section">
+      <div class="section-label">EXPERIENCE</div>
+      <div class="timeline">
+        {TIMELINE.map((item: any, i: number) => (
+          <div class="timeline-item reveal" style={{ animationDelay: `${i * 80}ms` }}>
+            <div class="timeline-date">{item.date}</div>
+            <div class="timeline-content">
+              <div class="timeline-role">{item.role}</div>
+              <div class="timeline-company">{item.company}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="skills-section">
+      <div class="section-label">STACK</div>
+      <div class="skills-grid">
+        {SKILLS.map((skill: string, i: number) => (
+          <div class="skill-chip reveal" style={{ animationDelay: `${i * 40}ms` }}>
+            {skill}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="cta-label">Let's talk?</div>
+      <p class="cta-text">If you have an idea, a project, or just want to chat about technology, write me.</p>
+      <a class="btn-primary" href="mailto:me@agustin.top">me@agustin.top</a>
+    </section>
+  </main>
+
+  <Footer locale={locale} />
+</BaseLayout>
+
+<style>
+  main { position: relative; z-index: 10; max-width: 720px; margin: 0 auto; padding: 120px 32px 100px; }
+
+  .hero { margin-bottom: 80px; }
+  .hero-label { font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px; }
+  .hero-title { font-family: var(--font-grotesk); font-size: clamp(2.4rem,5vw,3.6rem); font-weight: 600; line-height: 1.1; letter-spacing: -0.015em; margin-bottom: 8px; }
+  .hero-role { font-family: var(--font-mono); font-size: 14px; color: var(--color-text-dim); margin-bottom: 24px; }
+  .hero-bio { font-size: 16px; color: var(--color-text-dim); line-height: 1.7; max-width: 580px; margin-bottom: 32px; }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .section-label { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-faint); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 24px; }
+
+  .approach-section { margin-bottom: 80px; }
+  .approach-grid { display: grid; gap: 24px; }
+  .approach-card { border: 1px solid var(--color-line); border-radius: 8px; padding: 24px; background: var(--color-bg-panel); }
+  .approach-title { font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 10px; }
+  .approach-text { font-size: 15px; color: var(--color-text-dim); line-height: 1.65; }
+
+  .timeline { display: flex; flex-direction: column; gap: 0; border-left: 1px solid var(--color-line); margin-left: 8px; padding-left: 24px; }
+  .timeline-item { position: relative; padding: 0 0 28px 0; }
+  .timeline-item::before { content: ''; position: absolute; left: -29px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); }
+  .timeline-date { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-faint); margin-bottom: 4px; }
+  .timeline-role { font-family: var(--font-grotesk); font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+  .timeline-company { font-size: 14px; color: var(--color-text-dim); }
+
+  .skills-section { margin-top: 64px; margin-bottom: 80px; }
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill-chip { font-family: var(--font-mono); font-size: 12px; border: 1px solid var(--color-line); padding: 8px 14px; border-radius: 20px; color: var(--color-text-dim); transition: border-color .2s, color .2s; }
+  .skill-chip:hover { border-color: var(--color-accent-dim); color: var(--color-text); }
+
+  .cta-section { text-align: center; padding: 64px 0; border-top: 1px solid var(--color-line); }
+  .cta-label { font-family: var(--font-grotesk); font-size: clamp(1.6rem,4vw,2.4rem); font-weight: 600; margin-bottom: 12px; }
+  .cta-text { font-size: 15px; color: var(--color-text-dim); line-height: 1.65; max-width: 460px; margin: 0 auto 24px; }
+
+  .btn-primary { display: inline-block; background: var(--color-accent); color: white; font-family: var(--font-mono); font-size: 12px; font-weight: 500; padding: 10px 18px; border-radius: 6px; transition: transform .15s, box-shadow .2s; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.25); }
+  .btn-secondary { display: inline-block; background: transparent; color: var(--color-text-dim); border: 1px solid var(--color-line); font-family: var(--font-mono); font-size: 12px; padding: 10px 18px; border-radius: 6px; transition: border-color .2s, color .2s; }
+  .btn-secondary:hover { border-color: var(--color-text-faint); color: var(--color-text); }
+
+  .reveal { opacity: 0; transform: translateY(12px); animation: fade-up .6s ease forwards; }
+  @keyframes fade-up { to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 720px) {
+    main { padding: 96px 22px 80px; }
+  }
+</style>

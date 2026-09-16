@@ -1,0 +1,59 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
+import SystemHero from "../../components/system/SystemHero.astro";
+import CommandPalette from "../../components/system/CommandPalette.astro";
+import UnderstandSection from "../../components/sections/UnderstandSection.astro";
+import NarrativeBuild from "../../components/sections/NarrativeBuild.astro";
+import ProjectUniverse from "../../components/sections/ProjectUniverse.astro";
+import NarrativeWork from "../../components/sections/NarrativeWork.astro";
+import ConnectSection from "../../components/sections/ConnectSection.astro";
+import { person } from "../../data/person";
+
+const locale = "en";
+---
+
+<BaseLayout
+  locale={locale}
+  canonicalPath=""
+  title="Agustín Avellaneda | From idea to digital product"
+  description={person.positioning.en}
+>
+  <Navbar locale={locale} explore />
+  <CommandPalette locale={locale} />
+  <SystemHero locale={locale} />
+
+  <div class="transition-veil" data-transition-veil aria-hidden="true"></div>
+
+  <div data-narrative-root>
+    <main id="main-content">
+      <UnderstandSection locale={locale} />
+      <NarrativeBuild locale={locale} />
+      <ProjectUniverse locale={locale} />
+      <NarrativeWork locale={locale} />
+      <ConnectSection locale={locale} />
+    </main>
+    <Footer locale={locale} compact />
+  </div>
+
+  <script is:inline>
+    document.documentElement.classList.add("locked");
+    const __nr = document.querySelector("[data-narrative-root]");
+    if (__nr instanceof HTMLElement) __nr.hidden = true;
+  </script>
+  <noscript>
+    <style>
+      html, body { overflow: auto !important; height: auto !important; overscroll-behavior: auto !important; }
+      [data-hero-stage] { position: relative !important; height: auto !important; inset: auto !important; }
+      [data-narrative-root] { display: block !important; visibility: visible !important; }
+    </style>
+  </noscript>
+</BaseLayout>
+
+<script>
+  import { initSystemHome } from "../../scripts/systemHome";
+  initSystemHome();
+</script>

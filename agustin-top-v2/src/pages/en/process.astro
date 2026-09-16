@@ -1,0 +1,36 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
+import ProcessSection from "../../components/sections/ProcessSection.astro";
+import { ui } from "../../i18n/ui";
+
+const locale = "en" as const;
+const t = ui[locale].processPage;
+const prefix = `/${locale}`;
+---
+
+<BaseLayout
+  locale={locale}
+  title={`${t.title} | Agustín Avellaneda`}
+  description={t.subtitle}
+  canonicalPath="process"
+>
+  <Navbar locale={locale} />
+  <main id="main-content" class="pt-16">
+    <ProcessSection locale={locale} full />
+    <div class="border-t border-line px-5 py-16 md:px-8">
+      <div class="mx-auto max-w-6xl">
+        <a
+          href={`${prefix}/`}
+          class="inline-flex min-h-12 items-center rounded-md bg-accent px-8 py-3 text-base font-semibold text-ink hover:bg-accent-dim focus-ring"
+        >
+          {t.cta}
+        </a>
+      </div>
+    </div>
+  </main>
+  <Footer locale={locale} />
+</BaseLayout>

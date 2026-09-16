@@ -1,0 +1,312 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import SceneCanvas from "../scene/SceneCanvas.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const h = ui[locale].hero;
+const idea = ui[locale].idea;
+const prefix = `/${locale}`;
+---
+
+<section
+  class="immersive-shell relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden bg-[#03040a] text-[#f2f0eb]"
+  aria-labelledby="immersive-heading"
+  data-immersive
+  data-awake="false"
+>
+  <div class="absolute inset-0 z-0">
+    <SceneCanvas mode="chaos" variant="hero" eager />
+  </div>
+
+  <header
+    class="pointer-events-none absolute inset-x-0 top-0 z-50 flex items-center justify-between gap-3 px-5 pt-5 md:px-8 md:pt-6"
+  >
+    <a
+      href={`${prefix}/`}
+      class="pointer-events-auto font-display text-sm font-semibold tracking-tight text-white/60 transition-colors hover:text-white focus-ring rounded-sm"
+    >
+      agustin<span class="text-[#e8ff47]">.</span>top
+    </a>
+    <div class="pointer-events-auto flex items-center gap-2">
+      <a
+        href={locale === "es" ? "/en/" : "/es/"}
+        class="rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-white/50 transition-colors hover:text-white focus-ring"
+      >
+        {locale === "es" ? "EN" : "ES"}
+      </a>
+      <a
+        href={`${prefix}/explore`}
+        class="rounded-md border border-white/15 bg-black/30 px-3 py-1.5 text-xs font-medium text-white/70 backdrop-blur-sm transition-colors hover:text-white focus-ring sm:text-sm"
+      >
+        {h.skip}
+      </a>
+    </div>
+  </header>
+
+  <!-- Center status chip (scene is the hero) -->
+  <div
+    id="ai-hint"
+    class="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6"
+  >
+    <div class="status-chip mb-8 rounded-full border border-[#e8ff47]/25 bg-black/20 px-4 py-1.5 backdrop-blur-md">
+      <span class="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.2em] text-[#e8ff47] uppercase">
+        <span class="status-dot"></span>
+        {h.aiLabel}
+      </span>
+    </div>
+    <p class="ai-hint-text max-w-md text-center font-display text-sm tracking-[0.14em] text-white/50 uppercase md:text-base">
+      {h.interactHint}
+    </p>
+  </div>
+
+  <!-- Bottom dock chat — does not cover the 3D field -->
+  <div
+    id="ai-ui"
+    class="ai-ui pointer-events-none absolute inset-x-0 bottom-0 z-30 translate-y-6 opacity-0 transition-all duration-500"
+    aria-hidden="true"
+  >
+    <div
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#03040a] via-[#03040a]/75 to-transparent"
+    >
+    </div>
+
+    <div class="pointer-events-auto relative mx-auto w-full max-w-xl px-4 pb-6 md:px-6 md:pb-8">
+      <div
+        class="ai-msg mb-3 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 backdrop-blur-xl"
+        data-msg="greeting"
+      >
+        <p class="text-[10px] font-medium tracking-[0.18em] text-[#e8ff47]/80 uppercase">
+          {h.aiLabel}
+        </p>
+        <p id="immersive-heading" class="mt-1.5 font-display text-lg text-white md:text-xl">
+          {idea.title}
+        </p>
+        <p class="mt-1 text-sm leading-relaxed text-white/55">
+          {h.aiLine}
+        </p>
+      </div>
+
+      <form id="immersive-idea-form" novalidate>
+        <label for="immersive-idea-input" class="sr-only">{idea.label}</label>
+        <div
+          class="flex items-end gap-2 rounded-2xl border border-white/15 bg-black/55 p-1.5 shadow-[0_0_80px_rgba(232,255,71,0.12)] backdrop-blur-xl focus-within:border-[#e8ff47]/45"
+        >
+          <textarea
+            id="immersive-idea-input"
+            name="idea"
+            rows="2"
+            required
+            maxlength="2000"
+            placeholder={idea.placeholder}
+            class="max-h-28 min-h-[2.75rem] flex-1 resize-none bg-transparent px-3 py-2 text-[15px] text-white placeholder:text-white/35 focus:outline-none"
+          ></textarea>
+          <button
+            type="submit"
+            class="mb-0.5 inline-flex h-10 shrink-0 items-center justify-center rounded-xl bg-[#e8ff47] px-4 text-sm font-semibold text-[#03040a] transition-transform hover:scale-[1.03] focus-ring"
+          >
+            {h.send}
+          </button>
+        </div>
+        <p id="immersive-idea-error" class="mt-2 hidden text-sm text-red-400" role="alert">
+          {idea.empty}
+        </p>
+      </form>
+
+      <div
+        id="flow-result"
+        class="mt-3 hidden max-h-[32dvh] overflow-y-auto rounded-2xl border border-white/10 bg-black/50 p-4 backdrop-blur-xl"
+        hidden
+      >
+        <p class="text-[10px] font-medium tracking-[0.16em] text-[#e8ff47] uppercase">
+          {idea.understood}
+        </p>
+        <dl class="mt-3 grid gap-2.5 sm:grid-cols-2">
+          <div>
+            <dt class="text-[10px] text-white/40 uppercase">{idea.product}</dt>
+            <dd id="immersive-out-product" class="mt-0.5 text-sm text-white/85"></dd>
+          </div>
+          <div>
+            <dt class="text-[10px] text-white/40 uppercase">{idea.users}</dt>
+            <dd id="immersive-out-users" class="mt-0.5 text-sm text-white/85"></dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-[10px] text-white/40 uppercase">{idea.problem}</dt>
+            <dd id="immersive-out-problem" class="mt-0.5 text-sm text-white/85"></dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-[10px] text-[#e8ff47]/70 uppercase">{idea.mvp}</dt>
+            <dd id="immersive-out-mvp" class="mt-0.5 text-sm text-white/85"></dd>
+          </div>
+        </dl>
+        <div class="mt-4 flex flex-col gap-2 sm:flex-row">
+          <a
+            id="immersive-contact-link"
+            href={`${prefix}/contact`}
+            class="inline-flex min-h-10 items-center justify-center rounded-xl bg-[#e8ff47] px-4 text-sm font-semibold text-[#03040a] focus-ring"
+          >
+            {idea.talk}
+          </a>
+          <a
+            href={`${prefix}/explore`}
+            class="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/20 px-4 text-sm text-white/75 focus-ring"
+          >
+            {h.skip}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { structureIdea } from "../../scripts/ideaStructure";
+
+  const locale = document.documentElement.lang === "en" ? "en" : "es";
+  const shell = document.querySelector("[data-immersive]");
+  const hint = document.getElementById("ai-hint");
+  const ui = document.getElementById("ai-ui");
+  const form = document.getElementById("immersive-idea-form") as HTMLFormElement | null;
+  const input = document.getElementById("immersive-idea-input") as HTMLTextAreaElement | null;
+  const error = document.getElementById("immersive-idea-error");
+  const result = document.getElementById("flow-result");
+  const contactLink = document.getElementById(
+    "immersive-contact-link",
+  ) as HTMLAnchorElement | null;
+
+  let awake = false;
+
+  function setSceneMode(mode: "chaos" | "listen" | "structure") {
+    document.querySelectorAll("[data-scene-root]").forEach((root) => {
+      root.dispatchEvent(new CustomEvent("scene:set-mode", { detail: { mode } }));
+    });
+  }
+
+  function pulseScene() {
+    document.querySelectorAll("[data-scene-root]").forEach((root) => {
+      root.dispatchEvent(new CustomEvent("scene:pulse"));
+    });
+  }
+
+  function wake() {
+    if (awake) return;
+    awake = true;
+    shell?.setAttribute("data-awake", "true");
+    hint?.classList.add("is-gone");
+    ui?.classList.add("is-visible");
+    ui?.setAttribute("aria-hidden", "false");
+    setSceneMode("listen");
+    pulseScene();
+    window.setTimeout(() => input?.focus({ preventScroll: true }), 280);
+  }
+
+  ["pointermove", "pointerdown", "wheel"].forEach((type) => {
+    window.addEventListener(type, () => wake(), { passive: true, once: true });
+  });
+  window.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key === "Enter" || e.key === " " || e.key === "Tab") wake();
+    },
+    { passive: true },
+  );
+
+  // Idle ambient pulses so the field feels alive before interaction
+  window.setInterval(() => {
+    if (!awake) pulseScene();
+  }, 3200);
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    wake();
+    const text = input?.value?.trim() ?? "";
+    if (text.length < 8) {
+      error?.classList.remove("hidden");
+      input?.focus();
+      return;
+    }
+    error?.classList.add("hidden");
+
+    const structured = structureIdea(text, locale);
+    const set = (id: string, value: string) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    };
+    set("immersive-out-product", structured.product);
+    set("immersive-out-users", structured.users);
+    set("immersive-out-problem", structured.problem);
+    set("immersive-out-mvp", structured.mvp);
+
+    if (contactLink) {
+      contactLink.href = `/${locale}/contact?idea=${encodeURIComponent(text.slice(0, 500))}`;
+    }
+
+    setSceneMode("structure");
+    pulseScene();
+    result?.classList.remove("hidden");
+    result?.removeAttribute("hidden");
+  });
+</script>
+
+<style>
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e8ff47;
+    box-shadow: 0 0 10px #e8ff47;
+    animation: status-blink 1.6s ease-in-out infinite;
+  }
+
+  .ai-hint-text {
+    animation: hint-breathe 2.8s ease-in-out infinite;
+  }
+
+  #ai-hint.is-gone {
+    opacity: 0;
+    transform: translateY(-12px);
+    transition:
+      opacity 0.45s ease,
+      transform 0.45s ease;
+    pointer-events: none;
+  }
+
+  .ai-ui.is-visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto;
+  }
+
+  @keyframes status-blink {
+    0%,
+    100% {
+      opacity: 0.45;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.25);
+    }
+  }
+
+  @keyframes hint-breathe {
+    0%,
+    100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.75;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-hint-text,
+    .status-dot {
+      animation: none !important;
+    }
+  }
+</style>

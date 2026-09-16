@@ -1,0 +1,138 @@
+---
+import "@fontsource-variable/syne";
+import "@fontsource-variable/dm-sans";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/500.css";
+import "../styles/global.css";
+import type { Locale } from "../i18n/ui";
+import { getLocalizedPath } from "../i18n/utils";
+import { person } from "../data/person";
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  description?: string;
+  image?: string;
+  canonicalPath?: string;
+  /** Lock viewport: no page scroll (immersive idea flow). */
+  immersive?: boolean;
+}
+
+const {
+  locale,
+  title = locale === "es"
+    ? "Agustín Avellaneda | Product builder · software, diseño e IA"
+    : "Agustín Avellaneda | Product builder · software, design & AI",
+  description = person.positioning[locale],
+  image = "https://www.agustin.top/og-image.webp",
+  canonicalPath = "",
+  immersive = false,
+} = Astro.props;
+
+const site = Astro.site?.href?.replace(/\/$/, "") ?? "https://www.agustin.top";
+const canonical = `${site}${getLocalizedPath(locale, canonicalPath)}`;
+const altLocale = locale === "es" ? "en" : "es";
+const faviconHref = "/favicon.ico?v=2";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      name: person.name,
+      url: site,
+      jobTitle: person.jobTitle[locale],
+      description: person.positioning[locale],
+      sameAs: [...person.sameAs],
+      email: person.email,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: person.location.locality,
+        addressCountry: person.location.country,
+      },
+      knowsLanguage: [...person.languages],
+    },
+    {
+      "@type": "WebSite",
+      name: "Agustín Avellaneda",
+      url: site,
+      inLanguage: [locale, altLocale],
+      description: person.positioning[locale],
+    },
+    {
+      "@type": "WebPage",
+      name: title,
+      description,
+      url: canonical,
+      inLanguage: locale,
+      isPartOf: { "@type": "WebSite", url: site },
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href={faviconHref} type="image/x-icon" sizes="any" />
+    <link rel="shortcut icon" href={faviconHref} type="image/x-icon" />
+    <link rel="apple-touch-icon" href={faviconHref} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href={`${site}${getLocalizedPath("es", canonicalPath)}`}
+    />
+    <link
+      rel="alternate"
+      hreflang="en"
+      href={`${site}${getLocalizedPath("en", canonicalPath)}`}
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={`${site}${getLocalizedPath("es", canonicalPath)}`}
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta property="og:site_name" content="Agustín Avellaneda" />
+    <meta property="og:locale" content={locale === "es" ? "es_AR" : "en_US"} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body
+    class:list={[
+      "font-sans antialiased bg-ink text-paper",
+      immersive && "immersive-page overflow-hidden h-[100dvh]",
+    ]}
+  >
+    {
+      !immersive && (
+        <a
+          href="#main-content"
+          class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-ink"
+        >
+          {locale === "es" ? "Saltar al contenido" : "Skip to content"}
+        </a>
+      )
+    }
+    <slot />
+    <script>
+      import { initReveal, initNavScroll } from "../scripts/reveal";
+      initReveal();
+      if (!document.body.classList.contains("immersive-page")) {
+        initNavScroll();
+      }
+    </script>
+  </body>
+</html>

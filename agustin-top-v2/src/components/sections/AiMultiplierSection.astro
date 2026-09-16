@@ -1,0 +1,48 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import { aiMultiplierMessage, aiUseCases } from "../../data/process";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].aiSection;
+---
+
+<section
+  id="ai"
+  class="border-t border-line bg-ink-elevated px-5 py-20 md:px-8 md:py-28"
+  aria-labelledby="ai-heading"
+>
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal max-w-3xl">
+      <h2
+        id="ai-heading"
+        class="font-display text-3xl font-semibold tracking-tight text-paper md:text-4xl"
+      >
+        {t.title}
+      </h2>
+      <p class="mt-6 font-display text-2xl leading-snug text-accent md:text-3xl">
+        {aiMultiplierMessage[locale]}
+      </p>
+      <p class="mt-4 text-base text-fog md:text-lg">{t.body}</p>
+    </div>
+
+    <div class="reveal mt-12">
+      <h3 class="text-xs font-medium tracking-[0.15em] text-mist/70 uppercase">
+        {t.listTitle}
+      </h3>
+      <ul class="mt-6 flex flex-wrap gap-x-3 gap-y-3">
+        {
+          aiUseCases[locale].map((item) => (
+            <li class="rounded-md border border-line px-3 py-1.5 text-sm text-fog">
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,150 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const locale = "es";
+---
+
+<BaseLayout locale={locale} title="Análisis de Idea — Agustín Avellaneda" canonicalPath="/analysis">
+  <main id="main">
+    <div class="empty" id="empty">
+      <div class="empty-icon">◇</div>
+      <p>No hay idea para analizar.</p>
+      <p class="empty-hint">Escribí una idea en el orbital y presioná Enter.</p>
+      <a href={`/${locale}/`}>&larr; Volver a orbitar</a>
+    </div>
+  </main>
+
+  <script is:inline define:vars={{ locale }}>
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; });
+  }
+
+  function renderAnalysis() {
+    var raw = sessionStorage.getItem('agustinIdeaAnalysis');
+    var emptyEl = document.getElementById('empty');
+    var mainEl = document.getElementById('main');
+    if (!raw) { emptyEl.classList.add('show'); return; }
+    var data;
+    try { data = JSON.parse(raw); } catch(e) { data = null; }
+    if (!data || !data.idea) { emptyEl.classList.add('show'); return; }
+
+    var isFallback = data.source === 'fallback';
+
+    var subject = encodeURIComponent('Idea: ' + data.idea.substring(0, 50));
+    var body = encodeURIComponent(
+      'Hola Agustín,\n\nTengo una idea que me gustaría construir:\n\n"' + data.idea + '"\n\n' +
+      'Componentes inferidos: ' + (data.tags || []).join(', ') + '\n\n' +
+      'Propuesta MVP:\n' + (data.mvp || []).map(function(s, i) { return (i+1)+'. '+s; }).join('\n') + '\n\n' +
+      'Próximos pasos:\n' + (data.steps || []).map(function(s, i) { return (i+1)+'. '+s; }).join('\n') + '\n\n' +
+      'Hablemos.'
+    );
+    var mailto = 'mailto:me@agustin.top?subject=' + subject + '&body=' + body;
+
+    var fallbackBanner = isFallback
+      ? '<div class="fallback-banner reveal" style="animation-delay:0ms">' +
+        '<div class="fallback-icon">⚠</div>' +
+        '<div class="fallback-text">' +
+          '<strong>Análisis local</strong> — La API de análisis no está disponible desde este entorno. ' +
+          'Estos son los resultados generados localmente. Para un análisis completo con IA, ' +
+          '<a href="mailto:me@agustin.top?subject=' + encodeURIComponent('Análisis de idea: ' + data.idea.substring(0, 50)) + '">enviame un email</a>.' +
+        '</div>' +
+        '<button class="fallback-retry" id="retry-btn" type="button">Reintentar</button>' +
+        '</div>'
+      : '';
+
+    var projectsHtml = (data.projects || []).slice(0,3).map(function(p) {
+      return '<a class="stage-card" href="/' + locale + '/projects/' + (p.slug || '') + '/"><div class="stage-card-head"><span class="stage-card-title">' + escapeHtml(p.title) + '</span><span class="stage-card-view">Ver →</span></div><div class="stage-card-meta">' + escapeHtml(p.category || '') + ' · ' + escapeHtml(p.type || '') + '</div></a>';
+    }).join('');
+
+    var polishedHtml = data.polishedIdea ? '<section class="stage-section reveal" style="animation-delay:180ms"><div class="stage-section-title">Idea pulida</div><div class="stage-text">' + escapeHtml(data.polishedIdea) + '</div></section>' : '';
+    var mvpHtml = (data.mvp || []).map(function(item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('');
+    var stepsHtml = (data.steps || []).map(function(item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('');
+    var tagsHtml = (data.tags || []).map(function(t) { return '<span>' + escapeHtml(t) + '</span>'; }).join('');
+
+    mainEl.insertAdjacentHTML('beforeend',
+      fallbackBanner +
+      '<div class="stage-label reveal" style="animation-delay:40ms">ANÁLISIS DE IDEA</div>' +
+      '<h1 class="stage-title reveal" style="animation-delay:80ms">' + escapeHtml(data.idea) + '</h1>' +
+      polishedHtml +
+      '<section class="stage-section reveal" style="animation-delay:220ms"><div class="stage-section-title">Lo que dijiste</div><div class="stage-text">' + escapeHtml(data.idea) + '</div></section>' +
+      '<section class="stage-section reveal" style="animation-delay:280ms"><div class="stage-section-title">Componentes inferidos</div><div class="stage-chips">' + tagsHtml + '</div></section>' +
+      '<section class="stage-section reveal" style="animation-delay:340ms"><div class="stage-section-title">Proyectos similares</div><div class="stage-cards">' + (projectsHtml || '<div class="stage-text">No hay coincidencias directas en el portfolio aún — esta idea es una dirección nueva.</div>') + '</div></section>' +
+      (stepsHtml ? '<section class="stage-section reveal" style="animation-delay:420ms"><div class="stage-section-title">Próximos pasos</div><ul class="stage-list">' + stepsHtml + '</ul></section>' : '') +
+      (mvpHtml ? '<section class="stage-section reveal" style="animation-delay:500ms"><div class="stage-section-title">Propuesta MVP</div><ul class="stage-list">' + mvpHtml + '</ul></section>' : '') +
+      '<div class="stage-actions reveal" style="animation-delay:620ms"><a class="btn-primary" href="' + mailto + '">Construir este MVP</a><a class="btn-secondary" href="/' + locale + '/" id="new-idea-btn">Nueva idea</a><a class="btn-secondary" href="/' + locale + '/">Volver a orbitar</a></div>'
+    );
+
+    document.getElementById('new-idea-btn').addEventListener('click', function() {
+      sessionStorage.removeItem('agustinIdeaAnalysis');
+    });
+
+    var retryBtn = document.getElementById('retry-btn');
+    if (retryBtn) {
+      retryBtn.addEventListener('click', function() {
+        sessionStorage.removeItem('agustinIdeaAnalysis');
+        window.location.href = '/' + locale + '/';
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderAnalysis);
+
+  window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { e.preventDefault(); window.location.href = '/' + locale + '/'; }
+  });
+  </script>
+</BaseLayout>
+
+<style>
+  main { position: relative; z-index: 10; max-width: 820px; margin: 0 auto; padding: 120px 32px 100px; }
+  .empty { min-height: 60vh; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; }
+  .empty.show { display: flex; }
+  .empty-icon { font-size: 32px; color: var(--color-text-faint); margin-bottom: 4px; }
+  .empty p { color: var(--color-text-dim); font-size: 15px; margin: 0; }
+  .empty-hint { color: var(--color-text-faint); font-size: 13px; }
+  .empty a { font-family: var(--font-mono); font-size: 13px; color: var(--color-accent); border-bottom: 1px solid var(--color-accent-dim); text-decoration: none; margin-top: 8px; }
+
+  .fallback-banner { display: flex; align-items: flex-start; gap: 12px; background: rgba(234,179,8,0.06); border: 1px solid rgba(234,179,8,0.2); border-radius: 8px; padding: 16px 18px; margin-bottom: 48px; }
+  .fallback-icon { font-size: 16px; color: #eab308; flex-shrink: 0; margin-top: 1px; }
+  .fallback-text { font-size: 13px; color: var(--color-text-dim); line-height: 1.6; }
+  .fallback-text strong { color: #eab308; font-weight: 600; }
+  .fallback-text a { color: var(--color-accent); text-decoration: underline; text-decoration-color: var(--color-accent-dim); }
+  .fallback-text a:hover { text-decoration-color: var(--color-accent); }
+  .fallback-retry { flex-shrink: 0; font-family: var(--font-mono); font-size: 11px; color: #eab308; border: 1px solid rgba(234,179,8,0.3); background: transparent; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: border-color .2s; white-space: nowrap; align-self: center; }
+  .fallback-retry:hover { border-color: #eab308; }
+
+  .stage-label { font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px; }
+  .stage-title { font-family: var(--font-grotesk); font-size: clamp(2rem,5vw,3.4rem); font-weight: 600; line-height: 1.1; letter-spacing: -0.015em; margin-bottom: 64px; }
+  .stage-section { margin-bottom: 48px; }
+  .stage-section-title { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-faint); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 14px; }
+  .stage-text { font-size: 15px; color: var(--color-text-dim); line-height: 1.65; }
+  .stage-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stage-chips span { font-family: var(--font-mono); font-size: 12px; border: 1px solid var(--color-line); padding: 6px 12px; border-radius: 20px; color: var(--color-text-dim); }
+  .stage-cards { display: flex; flex-direction: column; gap: 12px; }
+  .stage-card { display: block; background: var(--color-bg-panel); border: 1px solid var(--color-line); border-radius: 8px; padding: 18px; transition: border-color .2s, transform .15s; text-decoration: none; }
+  .stage-card:hover { border-color: var(--color-accent-dim); transform: translateY(-1px); }
+  .stage-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 6px; }
+  .stage-card-title { font-family: var(--font-grotesk); font-size: 16px; font-weight: 600; color: var(--color-text); }
+  .stage-card-meta { font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); text-transform: uppercase; }
+  .stage-card-view { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-faint); transition: color .2s; }
+  .stage-card:hover .stage-card-view { color: var(--color-accent); }
+  .stage-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .stage-list li { font-size: 14px; color: var(--color-text-dim); padding-left: 20px; position: relative; line-height: 1.55; }
+  .stage-list li::before { content: '\2192'; position: absolute; left: 0; color: var(--color-accent); font-family: var(--font-mono); font-size: 11px; }
+  .stage-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 64px; }
+  .btn-primary { display: inline-block; background: var(--color-accent); color: white; font-family: var(--font-mono); font-size: 12px; font-weight: 500; padding: 10px 18px; border-radius: 6px; transition: transform .15s, box-shadow .2s; text-decoration: none; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.25); }
+  .btn-secondary { display: inline-block; background: transparent; color: var(--color-text-dim); border: 1px solid var(--color-line); font-family: var(--font-mono); font-size: 12px; padding: 10px 18px; border-radius: 6px; transition: border-color .2s, color .2s; text-decoration: none; }
+  .btn-secondary:hover { border-color: var(--color-text-faint); color: var(--color-text); }
+  .reveal { opacity: 0; transform: translateY(12px); animation: fade-up .6s ease forwards; }
+  @keyframes fade-up { to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 720px) {
+    main { padding: 96px 22px 80px; }
+    .stage-title { margin-bottom: 48px; }
+    .stage-actions { margin-top: 48px; }
+    .fallback-banner { flex-direction: column; gap: 10px; }
+    .fallback-retry { align-self: flex-start; }
+  }
+</style>

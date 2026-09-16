@@ -1,0 +1,102 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].system;
+---
+
+<form
+  id="system-command-form"
+  class="cmdbar"
+  data-command-bar
+  autocomplete="off"
+>
+  <label for="system-idea-input" class="sr-only">{t.placeholder}</label>
+  <div class="cmdbar-shell">
+    <span class="cmdbar-icon" aria-hidden="true">&gt;</span>
+    <input
+      id="system-idea-input"
+      name="idea"
+      type="text"
+      placeholder={t.placeholder}
+      maxlength="500"
+      required
+      autocomplete="off"
+      data-idea-input
+    />
+    <button type="submit" class="cmdbar-send glow-accent" aria-label={t.submit}>
+      ↵
+    </button>
+  </div>
+</form>
+
+<style>
+  .cmdbar {
+    margin-top: 40px;
+    position: relative;
+    max-width: 560px;
+  }
+
+  .cmdbar-shell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(17, 18, 20, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 15px 16px;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  .cmdbar-shell:focus-within {
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 32px rgba(232, 255, 71, 0.12);
+  }
+
+  .cmdbar-shell input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14.5px;
+    min-height: 28px;
+  }
+
+  .cmdbar-shell input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .cmdbar-icon {
+    color: var(--text-faint);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .cmdbar-send {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #0a0a0b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+
+  .cmdbar-send:hover {
+    transform: scale(1.06);
+  }
+</style>

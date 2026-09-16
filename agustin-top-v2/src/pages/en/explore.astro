@@ -1,0 +1,20 @@
+---
+export const prerender = true;
+const target = "/en/#proof";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <link rel="canonical" href="https://www.agustin.top/en/" />
+    <title>Redirecting…</title>
+    <script is:inline define:vars={{ target }}>
+      location.replace(target);
+    </script>
+  </head>
+  <body>
+    <p><a href={target}>Continue to projects</a></p>
+  </body>
+</html>

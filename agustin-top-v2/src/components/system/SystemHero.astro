@@ -1,0 +1,427 @@
+---
+import type { Locale } from "../../i18n/ui";
+import { ui } from "../../i18n/ui";
+import SceneCanvas from "../scene/SceneCanvas.astro";
+import CommandBar from "./CommandBar.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].system;
+const chips = t.chips;
+---
+
+<section
+  id="think"
+  class="system-hero"
+  data-section="think"
+  data-hero-stage
+  data-hero-mode="explore"
+>
+  <SceneCanvas mode="chaos" variant="hero" eager />
+
+  <div class="hero-inner">
+    <div
+      class="status-strip"
+      data-system-status
+      data-status="idle"
+      data-label-ready={t.statusReady}
+      data-label-thinking={t.statusThinking}
+      data-label-complete={t.statusComplete}
+      aria-live="polite"
+    >
+      <span class="status-primary">
+        <i class="dot pulse" data-status-dot aria-hidden="true"></i>
+        <span data-status-label>{t.statusReady}</span>
+      </span>
+      {chips.slice(1).map((chip) => <span data-static-chip>{chip}</span>)}
+    </div>
+
+    <h1 class="headline">
+      <span class="line"><span>{t.headlineLine1}</span></span>
+      <span class="line"><span>{t.headlineLine2}</span></span>
+    </h1>
+    <p class="sub">{t.subhead}</p>
+
+    <CommandBar locale={locale} />
+
+    <div class="ai-readout hidden" data-ai-readout aria-live="polite">
+      <span class="glyph" aria-hidden="true">◌</span>
+      <span data-ai-readout-text>{t.statusThinking}</span>
+    </div>
+
+    <div class="result-panel" data-result-panel hidden>
+      <div class="result-label" data-result-label>{t.statusComplete}</div>
+      <div class="result-chips" data-result-chips></div>
+      <div class="result-projects" data-result-projects></div>
+      <p class="result-note" data-result-note></p>
+    </div>
+  </div>
+
+  <div class="hero-controls" aria-hidden="true">
+    {t.heroControls}
+  </div>
+
+  <button type="button" class="skip-btn glow-accent" data-skip-portfolio>
+    {t.skipPortfolio}
+  </button>
+
+  <div class="telemetry" aria-hidden="true" data-telemetry>
+    <div class="row">NODES <span class="v" data-tm-nodes>48</span></div>
+    <div class="row">SYNC <span class="v" data-tm-sync>100%</span></div>
+    <div class="row">LATENCY <span class="v" data-tm-latency>18ms</span></div>
+  </div>
+
+  <div class="scene-debug" data-scene-debug>scene: initializing...</div>
+</section>
+
+<style>
+  .system-hero {
+    position: fixed;
+    inset: 0;
+    height: 100dvh;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 32px;
+    overflow: hidden;
+    cursor: grab;
+    transition:
+      opacity 0.9s ease,
+      transform 0.9s ease,
+      filter 0.9s ease;
+  }
+
+  .system-hero:active {
+    cursor: grabbing;
+  }
+
+  .system-hero.exited {
+    opacity: 0;
+    transform: scale(1.06);
+    filter: blur(6px);
+    pointer-events: none;
+  }
+
+  .system-hero[data-hero-mode="portfolio"] {
+    display: none;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 3;
+    max-width: 640px;
+    pointer-events: none;
+  }
+
+  .hero-inner :global(a),
+  .hero-inner :global(button),
+  .hero-inner :global(input),
+  .hero-inner :global(form),
+  .hero-inner :global(label) {
+    pointer-events: auto;
+  }
+
+  .status-strip {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
+  }
+
+  .status-primary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+    box-shadow: 0 0 8px rgba(232, 255, 71, 0.8);
+  }
+
+  .dot.pulse {
+    animation: status-dot-pulse 1.8s ease-in-out infinite;
+  }
+
+  .headline {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(2.6rem, 6.6vw, 4.6rem);
+    line-height: 1.03;
+    letter-spacing: -0.015em;
+    max-width: 13ch;
+    overflow: hidden;
+    color: var(--text);
+  }
+
+  .headline .line {
+    display: block;
+    overflow: hidden;
+  }
+
+  .headline .line span {
+    display: inline-block;
+    transform: translateY(110%);
+    animation: reveal-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .headline .line:nth-child(2) span {
+    animation-delay: 0.08s;
+  }
+
+  .sub {
+    margin-top: 20px;
+    font-size: 15px;
+    color: var(--text-dim);
+    max-width: 38ch;
+    line-height: 1.55;
+    opacity: 0;
+    animation: fade-in 0.8s ease forwards;
+    animation-delay: 0.5s;
+  }
+
+  .ai-readout {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-readout.hidden {
+    display: none;
+  }
+
+  .ai-readout .glyph {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    color: var(--accent);
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .result-panel {
+    margin-top: 22px;
+    max-width: 560px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(17, 18, 20, 0.55);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+  }
+
+  .result-panel[hidden] {
+    display: none;
+  }
+
+  .result-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+  }
+
+  .result-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .result-chips :global(span) {
+    font-family: var(--mono);
+    font-size: 12px;
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: var(--text-dim);
+  }
+
+  .result-projects {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .result-projects :global(.rp-count) {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--text-faint);
+    margin-bottom: 4px;
+  }
+
+  .result-projects :global(a) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13.5px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--text-dim);
+    transition: color 0.15s;
+  }
+
+  .result-projects :global(a:last-of-type) {
+    border-bottom: none;
+  }
+
+  .result-projects :global(a:hover) {
+    color: var(--text);
+  }
+
+  .result-note {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-faint);
+    line-height: 1.5;
+  }
+
+  .telemetry {
+    position: absolute;
+    bottom: 28px;
+    right: 32px;
+    z-index: 2;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .telemetry .row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .telemetry .v {
+    color: var(--text-dim);
+    min-width: 52px;
+    display: inline-block;
+    text-align: left;
+  }
+
+  .hero-controls {
+    position: absolute;
+    bottom: 28px;
+    left: 32px;
+    z-index: 2;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    max-width: 42ch;
+  }
+
+  .skip-btn {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 10px 20px;
+    background: rgba(17, 18, 20, 0.55);
+    backdrop-filter: blur(10px);
+    pointer-events: auto;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      transform 0.2s;
+  }
+
+  .skip-btn:hover {
+    border-color: var(--accent-dim);
+    transform: translateX(-50%) scale(1.04);
+  }
+
+  [data-status="thinking"] [data-status-label],
+  [data-status="complete"] [data-status-label] {
+    color: var(--accent);
+  }
+
+  @media (max-width: 720px) {
+    .system-hero {
+      padding: 0 20px;
+      justify-content: flex-end;
+      padding-bottom: 100px;
+    }
+
+    .telemetry,
+    .hero-controls {
+      display: none;
+    }
+
+    .skip-btn {
+      bottom: 20px;
+      font-size: 11px;
+      padding: 9px 16px;
+    }
+
+    .headline {
+      max-width: 100%;
+    }
+  }
+
+  .scene-debug {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.75);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    white-space: pre;
+    line-height: 1.6;
+    max-width: 280px;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .headline .line span {
+      transform: none;
+      animation: none;
+    }
+
+    .sub {
+      opacity: 1;
+      animation: none;
+    }
+
+    .dot.pulse,
+    .ai-readout .glyph {
+      animation: none;
+    }
+  }
+</style>
