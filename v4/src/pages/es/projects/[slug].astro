@@ -18,6 +18,16 @@ export function getStaticPaths() {
 
 const locale = "es";
 const { project } = Astro.props;
+const site = "https://www.agustin.top";
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Inicio", item: `${site}/${locale}/` },
+    { "@type": "ListItem", position: 2, name: "Proyectos", item: `${site}/${locale}/projects/` },
+    { "@type": "ListItem", position: 3, name: project.title[locale], item: `${site}/${locale}/projects/${project.slug}/` },
+  ],
+};
 ---
 
 <BaseLayout
@@ -27,6 +37,9 @@ const { project } = Astro.props;
   image={`https://www.agustin.top${project.image}`}
   canonicalPath={`projects/${project.slug}`}
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
   <Navbar locale={locale} />
   <ParticleBackground />
   <main class="project-page">

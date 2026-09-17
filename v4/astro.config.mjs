@@ -16,7 +16,10 @@ export default defineConfig({
           en: "en",
         },
       },
-      filter: (page) => !page.includes("/api/"),
+      filter: (page) =>
+        !page.includes("/api/") &&
+        !page.endsWith("/analysis/") &&
+        !page.endsWith("/projects/"),
     }),
   ],
   vite: {
