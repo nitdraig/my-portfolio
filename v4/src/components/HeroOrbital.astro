@@ -118,6 +118,7 @@ const PROJECTS = getNodeProjects(locale);
         <h2 class="node-detail-title" id="nd-title"></h2>
         <span class="node-detail-tag" id="nd-tag"></span>
       </div>
+      <div class="node-detail-image" id="nd-image"></div>
       <p class="node-detail-intro" id="nd-intro"></p>
       <div class="node-detail-sections" id="nd-sections"></div>
       <div class="node-detail-links" id="nd-links"></div>
@@ -145,13 +146,6 @@ const PROJECTS = getNodeProjects(locale);
   </div>
 </section>
 
-<div id="cmdk-overlay">
-  <div id="cmdk-box">
-    <input id="cmdk-input" type="text" placeholder="Escribí un comando..." />
-    <div class="cmdk-list" id="cmdk-list"></div>
-  </div>
-</div>
-
 <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script is:inline defer define:vars={{ locale, CONCEPTS_JSON: JSON.stringify(CONCEPTS), NODE_DATA_JSON: JSON.stringify(NODE_DATA), NODE_ENRICHMENT_JSON: JSON.stringify(NODE_ENRICHMENT), PROJECTS_JSON: JSON.stringify(PROJECTS), CATEGORIES_JSON: JSON.stringify(CATEGORIES), STEP_TEMPLATES_JSON: JSON.stringify(STEP_TEMPLATES) }}>
 (function() {
@@ -167,6 +161,14 @@ const PROJECTS = getNodeProjects(locale);
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function getText(val) {
+    if (val && typeof val === 'object') {
+      if (val[currentLocale]) return val[currentLocale];
+      if (val.es) return val.es;
+    }
+    return val || '';
   }
 
   function decomposeIdea(text) {
@@ -432,51 +434,6 @@ const PROJECTS = getNodeProjects(locale);
         window.location.href = '/' + currentLocale + '/analysis';
       }, 500);
     });
-  });
-
-  /* ============ COMMAND PALETTE ============ */
-  var cmdkOverlay = document.getElementById('cmdk-overlay');
-  var cmdkInput = document.getElementById('cmdk-input');
-  var cmdkList = document.getElementById('cmdk-list');
-    var COMMANDS = [
-    ...CONCEPTS.map((key,i) => ({ label: NODE_DATA[key].title ? NODE_DATA[key].title[currentLocale] || key : key, tag:NODE_DATA[key].tag, action:function(){ window.__enterInspect(i); } })),
-    ...PROJECTS.map(function(p) { return { label: p.title, tag:p.category, action:function(){ window.__enterPortfolio('#proof'); setTimeout(function(){ /* showProjectDetail */ },950); } }; }),
-    { label:'Work', tag:'SECTION', href:'#build' },
-    { label:'AI', tag:'SECTION', href:'#understand' },
-    { label:'Proof', tag:'SECTION', href:'#proof' },
-    { label:'About', tag:'SECTION', href:'#connect' },
-  ];
-
-  function renderCmdk(filter) {
-    var f = (filter || '').toLowerCase();
-    var items = COMMANDS.filter(function(c) { return c.label.toLowerCase().includes(f); });
-    cmdkList.innerHTML = items.map(function(c,i) {
-      return '<div class="cmdk-item'+(i===0?' active':'')+'" data-idx="'+i+'"><span>'+c.label+'</span><span class="tag">'+c.tag+'</span></div>';
-    }).join('') || '<div class="cmdk-item">No results</div>';
-    cmdkList.querySelectorAll('.cmdk-item[data-idx]').forEach(function(el) {
-      el.addEventListener('click', function() {
-        var c = items[Number(el.dataset.idx)];
-        if (!c) return;
-        closeCmdk();
-        if (c.action) c.action();
-        else if (c.href) window.__enterPortfolio(c.href);
-      });
-    });
-  }
-
-  function openCmdk() { cmdkOverlay.classList.add('show'); cmdkInput.value=''; renderCmdk(''); cmdkInput.focus(); }
-  function closeCmdk() { cmdkOverlay.classList.remove('show'); }
-  window.__openCmdk = openCmdk;
-  window.__closeCmdk = closeCmdk;
-
-  /* Wire palette-trigger button (in Navbar) */
-  var paletteTrigger = document.getElementById('palette-trigger');
-  if (paletteTrigger) paletteTrigger.addEventListener('click', openCmdk);
-  cmdkOverlay.addEventListener('click', function(e) { if (e.target === cmdkOverlay) closeCmdk(); });
-  cmdkInput.addEventListener('input', function() { renderCmdk(cmdkInput.value); });
-  window.addEventListener('keydown', function(e) {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if (cmdkOverlay.classList.contains('show')) closeCmdk(); else openCmdk(); return; }
-    if (cmdkOverlay.classList.contains('show') && e.key === 'Escape') { e.preventDefault(); closeCmdk(); }
   });
 
   /* ============ MOBILE MENU ============ */
@@ -768,7 +725,7 @@ const PROJECTS = getNodeProjects(locale);
           var data = NODE_DATA[key];
           ntTitle.textContent = data.title ? data.title[currentLocale] || key : key;
           document.getElementById('nt-tag').textContent = data.tag;
-          document.getElementById('nt-preview').textContent = getNodePreview(data.desc);
+          document.getElementById('nt-preview').textContent = getNodePreview(getText(data.desc));
           tooltip.classList.add('show');
         }
       } else {
@@ -889,7 +846,7 @@ const PROJECTS = getNodeProjects(locale);
       var data = NODE_DATA[key];
       npTitle.textContent = data.title ? data.title[currentLocale] || key : key;
       npTag.textContent = data.tag;
-      npDesc.textContent = data.desc;
+      npDesc.textContent = getText(data.desc);
       npChips.innerHTML = data.chips.map(function(c) { return '<span>'+c+'</span>'; }).join('');
       nodeIdeaView.classList.remove('show');
       aiResult.classList.remove('show');
@@ -905,15 +862,15 @@ const PROJECTS = getNodeProjects(locale);
 
     function renderNodeContent(key, content) {
       if (!content) return '';
-      var title = content.title ? '<h3>'+content.title+'</h3>' : '';
+      var title = content.title ? '<h3>'+getText(content.title)+'</h3>' : '';
       if (content.type === 'list') {
         return title + '<ul class="node-content-list">' + content.items.map(function(item) {
-          return '<li><strong>'+item.title+'</strong> — '+item.text+'</li>';
+          return '<li><strong>'+getText(item.title)+'</strong> — '+getText(item.text)+'</li>';
         }).join('') + '</ul>';
       }
       if (content.type === 'tools') {
         return title + '<div class="node-grid node-tools">' + content.items.map(function(tool) {
-          return '<div class="node-card node-tool-card"><div class="node-card-title">'+tool.name+'<span class="node-card-meta">'+tool.meta+'</span></div><div class="node-card-desc">'+tool.desc+'</div><div class="node-card-links">'+tool.links.map(function(l) { return '<a href="'+l.url+'" target="_blank" rel="noopener">'+l.label+'</a>'; }).join('')+'</div></div>';
+          return '<div class="node-card node-tool-card"><div class="node-card-title">'+tool.name+'<span class="node-card-meta">'+tool.meta+'</span></div><div class="node-card-desc">'+getText(tool.desc)+'</div><div class="node-card-links">'+tool.links.map(function(l) { return '<a href="'+l.url+'" target="_blank" rel="noopener">'+l.label+'</a>'; }).join('')+'</div></div>';
         }).join('') + '</div>';
       }
       if (content.type === 'projects') {
@@ -925,12 +882,12 @@ const PROJECTS = getNodeProjects(locale);
       }
       if (content.type === 'resources') {
         return title + '<div class="node-grid node-resources">' + content.items.map(function(r) {
-          return '<div class="node-card node-resource-card"><div class="node-card-title">'+r.title+'</div><div class="node-card-meta">'+r.author+' · '+r.type+'</div><div class="node-card-links"><a href="'+r.link+'" target="_blank" rel="noopener">'+(currentLocale==='es'?'Leer →':'Read →')+'</a></div></div>';
+          return '<div class="node-card node-resource-card"><div class="node-card-title">'+getText(r.title)+'</div><div class="node-card-meta">'+r.author+' · '+getText(r.type)+'</div><div class="node-card-links"><a href="'+r.link+'" target="_blank" rel="noopener">'+(currentLocale==='es'?'Leer →':'Read →')+'</a></div></div>';
         }).join('') + '</div>';
       }
       if (content.type === 'testimonials') {
         return title + '<div class="node-testimonials">' + content.items.map(function(t) {
-          return '<blockquote class="node-testimonial"><q>'+t.quote+'</q><cite><strong>'+t.author+'</strong> — '+t.role+'</cite></blockquote>';
+          return '<blockquote class="node-testimonial"><q>'+getText(t.quote)+'</q><cite><strong>'+t.author+'</strong> — '+t.role+'</cite></blockquote>';
         }).join('') + '</div>';
       }
       if (content.type === 'timeline') {
@@ -939,7 +896,7 @@ const PROJECTS = getNodeProjects(locale);
           var activeClass = isActive ? ' active' : '';
           var dot = isActive ? '<span class="node-timeline-dot" aria-hidden="true"></span>' : '';
           var companyHtml = item.url ? '<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+item.company+'</a>' : item.company;
-          return '<div class="node-timeline-item'+activeClass+'"><div class="node-timeline-date">'+dot+item.date+'</div><div class="node-timeline-role">'+item.role+'</div><div class="node-timeline-company">'+companyHtml+'</div></div>';
+          return '<div class="node-timeline-item'+activeClass+'"><div class="node-timeline-date">'+dot+item.date+'</div><div class="node-timeline-role">'+getText(item.role)+'</div><div class="node-timeline-company">'+companyHtml+'</div></div>';
         }).join('') + '</div>';
       }
       return '';
@@ -986,6 +943,7 @@ const PROJECTS = getNodeProjects(locale);
     var ndIntro = document.getElementById('nd-intro');
     var ndSections = document.getElementById('nd-sections');
     var ndLinks = document.getElementById('nd-links');
+    var ndImage = document.getElementById('nd-image');
     var ndCarousel = document.getElementById('nd-carousel');
     var nodeDetailBack = document.getElementById('node-detail-back');
 
@@ -996,9 +954,10 @@ const PROJECTS = getNodeProjects(locale);
       if (!detail) return;
       ndTitle.textContent = data.title ? data.title[currentLocale] || currentNodeKey : currentNodeKey;
       ndTag.textContent = data.tag;
-      ndIntro.textContent = detail.intro;
+      ndImage.innerHTML = detail.image ? '<img src="' + detail.image + '" alt="' + (detail.imageAlt || data.title[currentLocale] || currentNodeKey) + '" loading="lazy" />' : '';
+      ndIntro.textContent = getText(detail.intro);
       ndSections.innerHTML = detail.sections.map(function(s, i) {
-        return '<div class="nd-section reveal-item" style="animation-delay:'+i*80+'ms"><h4>'+s.title+'</h4><p>'+s.text+'</p></div>';
+        return '<div class="nd-section reveal-item" style="animation-delay:'+i*80+'ms"><h4>'+getText(s.title)+'</h4><p>'+getText(s.text)+'</p></div>';
       }).join('');
       ndLinks.innerHTML = (detail.links || []).map(function(l) {
         if (l.url === '#' || l.url.indexOf('mailto:') === 0) {
@@ -1031,7 +990,7 @@ const PROJECTS = getNodeProjects(locale);
         items.forEach(function(t, i) {
           var companyLink = t.companyUrl ? '<a href="'+t.companyUrl+'" target="_blank" rel="noopener" class="carousel-company-link">'+t.companyName+'</a>' : (t.companyName || '');
           carouselHtml += '<div class="carousel-slide'+(i === 0 ? ' active' : '')+'">' +
-            '<blockquote class="carousel-quote"><q>'+t.quote+'</q></blockquote>' +
+            '<blockquote class="carousel-quote"><q>'+getText(t.quote)+'</q></blockquote>' +
             '<div class="carousel-author"><strong>'+t.author+'</strong> — '+t.role+', '+companyLink+'</div>' +
             '</div>';
         });

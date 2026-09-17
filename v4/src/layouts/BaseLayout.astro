@@ -11,6 +11,7 @@ import "../styles/global.css";
 import type { Locale } from "../i18n/ui";
 import { getLocalizedPath } from "../i18n/utils";
 import Navbar from "../components/Navbar.astro";
+import CmdPalette from "../components/CmdPalette.astro";
 import ParticleBackground from "../components/ParticleBackground.astro";
 import { SKILLS } from "../data/experience";
 
@@ -51,6 +52,7 @@ const jsonLd = {
         "https://www.linkedin.com/in/avellaneda-agustin/",
       ],
       email: "me@agustin.top",
+      image: `${site}/profile.webp`,
       knowsAbout: SKILLS,
       address: {
         "@type": "PostalAddress",
@@ -106,6 +108,7 @@ const jsonLd = {
   <body class="font-sans antialiased">
     <Navbar locale={locale} />
     <ParticleBackground />
+    <CmdPalette locale={locale} />
 
     <slot />
 

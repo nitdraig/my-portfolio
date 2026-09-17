@@ -1,9 +1,13 @@
 export const ui = {
   es: {
     nav: {
+      home: "Inicio",
       work: "WORK",
       ai: "AI",
       about: "ABOUT",
+      projects: "Proyectos",
+      proof: "Proof",
+      connect: "Connect",
       menuToggle: "Abrir menú",
     },
     footer: {
@@ -368,9 +372,13 @@ export const ui = {
   },
   en: {
     nav: {
+      home: "Home",
       work: "WORK",
       ai: "AI",
       about: "ABOUT",
+      projects: "Projects",
+      proof: "Proof",
+      connect: "Connect",
       menuToggle: "Open menu",
     },
     footer: {
