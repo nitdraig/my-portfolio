@@ -74,6 +74,11 @@ const PROJECTS = getNodeProjects(locale);
 
   <aside class="node-panel" id="node-panel" aria-hidden="true">
     <button class="back-btn" id="back-to-orbit" aria-label={t.backToOrbit}>{t.backToOrbit}</button>
+    <div class="node-panel-nav" id="node-panel-nav" aria-label={t.nodeDotsLabel}>
+      <button type="button" class="node-panel-nav-btn" id="node-prev" aria-label={t.nodeNavPrev}>←</button>
+      <span class="node-panel-nav-counter" id="node-nav-counter" aria-live="polite"></span>
+      <button type="button" class="node-panel-nav-btn" id="node-next" aria-label={t.nodeNavNext}>→</button>
+    </div>
     <div class="node-panel-header">
       <h2 class="node-panel-title" id="np-title">AI</h2>
       <span class="node-panel-tag" id="np-tag">CAPABILITY</span>
@@ -477,13 +482,18 @@ const PROJECTS = getNodeProjects(locale);
   (function() {
     var canvas = document.getElementById('graph-canvas');
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var isMobile = window.innerWidth < 640;
+    var cores = typeof navigator.hardwareConcurrency === 'number' ? navigator.hardwareConcurrency : 8;
+    var mem = typeof navigator.deviceMemory === 'number' ? navigator.deviceMemory : 8;
+    var lowPower = isMobile || cores <= 4 || mem <= 4;
+    var leanGfx = lowPower || reducedMotion;
     var scene = new THREE.Scene();
     // lexis: fog removed — alpha:true renders transparent, fog was fading nodes to dark on light theme
     var camera = new THREE.PerspectiveCamera(50, canvas.clientWidth/canvas.clientHeight, 0.1, 100);
     camera.position.set(0, 0, 15);
-    var isMobile = window.innerWidth < 640;
-    var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha:true, antialias: !isMobile });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha:true, antialias: !leanGfx, powerPreference: leanGfx ? 'low-power' : 'default' });
+    var maxDpr = leanGfx ? 1 : (isMobile ? 1.5 : 2);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxDpr));
     function resize() {
       var w = canvas.clientWidth, h = canvas.clientHeight;
       renderer.setSize(w, h, false);
@@ -520,7 +530,7 @@ const PROJECTS = getNodeProjects(locale);
     var haloTex = new THREE.CanvasTexture(haloCanvas);
     var haloMat = new THREE.SpriteMaterial({ map: haloTex, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending });
 
-    var hubGeo = new THREE.SphereGeometry(0.09, 16, 16);
+    var hubGeo = new THREE.SphereGeometry(0.09, leanGfx ? 10 : 16, leanGfx ? 10 : 16);
     var hubMat = new THREE.MeshBasicMaterial({ color: accent });
     var hubMeshes = hubPositions.map(function(pos) {
       var m = new THREE.Mesh(hubGeo, hubMat);
@@ -534,7 +544,7 @@ const PROJECTS = getNodeProjects(locale);
       return m;
     });
 
-    var centerGeo = new THREE.SphereGeometry(0.06, 16, 16);
+    var centerGeo = new THREE.SphereGeometry(0.06, leanGfx ? 10 : 16, leanGfx ? 10 : 16);
     var centerMesh = new THREE.Mesh(centerGeo, new THREE.MeshBasicMaterial({color:0xffffff}));
     group.add(centerMesh);
     var centerHalo = new THREE.Sprite(haloMat.clone());
@@ -555,7 +565,7 @@ const PROJECTS = getNodeProjects(locale);
 
     var ringMat = new THREE.MeshBasicMaterial({ color: dim, transparent:true, opacity:0.10, side:THREE.DoubleSide });
     var ringGroup = new THREE.Group();
-    var ringSeg = isMobile ? 40 : 80;
+    var ringSeg = leanGfx ? 24 : (isMobile ? 40 : 80);
     [3.9, 4.9, 6.0].forEach(function(r, i) {
       var ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.012, 8, ringSeg), ringMat);
       ring.rotation.x = (i * 0.7);
@@ -566,7 +576,7 @@ const PROJECTS = getNodeProjects(locale);
 
     var gridGroup = new THREE.Group();
     var gridMat = new THREE.LineBasicMaterial({ color: 0x2a2b2f, transparent:true, opacity:0.35 });
-    var gridSize = 14, gridDiv = isMobile ? 8 : 14;
+    var gridSize = 14, gridDiv = leanGfx ? 6 : (isMobile ? 8 : 14);
     for (var i=0;i<=gridDiv;i++) {
       var p = -gridSize/2 + (gridSize/gridDiv)*i;
       var g1 = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(p,0,-gridSize/2), new THREE.Vector3(p,0,gridSize/2)]);
@@ -577,7 +587,7 @@ const PROJECTS = getNodeProjects(locale);
     gridGroup.position.y = -3.6;
     scene.add(gridGroup);
 
-    var AMBIENT = isMobile ? 30 : 90;
+    var AMBIENT = leanGfx ? 12 : (isMobile ? 24 : 48);
     var ambientPositions = [];
     for (var i=0;i<AMBIENT;i++) {
       var ar = 2.2 + Math.random()*2.4;
@@ -587,16 +597,21 @@ const PROJECTS = getNodeProjects(locale);
     }
     var ambientGeo = new THREE.BufferGeometry();
     ambientGeo.setFromPoints(ambientPositions);
-    var ambientMat = new THREE.PointsMaterial({ color: 0x9a9c9f, size:0.045, transparent:true, opacity:0.6 });
+    var ambientMat = new THREE.PointsMaterial({ color: 0x9a9c9f, size: leanGfx ? 0.04 : 0.045, transparent:true, opacity: leanGfx ? 0.45 : 0.6 });
     var ambientPoints = new THREE.Points(ambientGeo, ambientMat);
     group.add(ambientPoints);
 
-    var ambLineMat = new THREE.LineBasicMaterial({ color: dim, transparent:true, opacity:0.22 });
-    for (var i=0;i<AMBIENT;i++) {
-      for (var j=i+1;j<AMBIENT;j++) {
-        if (ambientPositions[i].distanceTo(ambientPositions[j]) < 1.15 && Math.random() < 0.3) {
-          var lgeo = new THREE.BufferGeometry().setFromPoints([ambientPositions[i], ambientPositions[j]]);
-          group.add(new THREE.Line(lgeo, ambLineMat));
+    if (!leanGfx) {
+      var ambLineMat = new THREE.LineBasicMaterial({ color: dim, transparent:true, opacity:0.22 });
+      var ambLineBudget = isMobile ? 28 : 55;
+      var ambLinesAdded = 0;
+      for (var ai=0; ai<AMBIENT && ambLinesAdded < ambLineBudget; ai++) {
+        for (var aj=ai+1; aj<AMBIENT && ambLinesAdded < ambLineBudget; aj++) {
+          if (ambientPositions[ai].distanceTo(ambientPositions[aj]) < 1.15 && Math.random() < 0.28) {
+            var lgeo = new THREE.BufferGeometry().setFromPoints([ambientPositions[ai], ambientPositions[aj]]);
+            group.add(new THREE.Line(lgeo, ambLineMat));
+            ambLinesAdded++;
+          }
         }
       }
     }
@@ -707,36 +722,8 @@ const PROJECTS = getNodeProjects(locale);
 
     function getNodePreview(desc) { return desc ? desc.slice(0, 90) + (desc.length > 90 ? '...' : '') : ''; }
 
-    window.addEventListener('mousemove', function(e) {
-      var mx = (e.clientX / window.innerWidth) * 2 - 1;
-      var my = (e.clientY / window.innerHeight) * 2 - 1;
-      hoverRotY = mx * 0.12;
-      hoverRotX = my * 0.06;
-      ndc.x = mx;
-      ndc.y = -my;
-      raycaster.setFromCamera(ndc, camera);
-      var hits = raycaster.intersectObjects(hubMeshes);
-      if (hits.length && mode === 'explore' && !isDragging) {
-        canvas.style.cursor = 'pointer';
-        var idx = hubMeshes.indexOf(hits[0].object);
-        if (focusedIndex !== idx) {
-          focusedIndex = idx;
-          var key = CONCEPTS[idx];
-          var data = NODE_DATA[key];
-          ntTitle.textContent = data.title ? data.title[currentLocale] || key : key;
-          document.getElementById('nt-tag').textContent = data.tag;
-          document.getElementById('nt-preview').textContent = getNodePreview(getText(data.desc));
-          tooltip.classList.add('show');
-        }
-      } else {
-        canvas.style.cursor = mode === 'explore' ? (isDragging ? 'grabbing' : 'grab') : '';
-        focusedIndex = -1;
-        tooltip.classList.remove('show');
-      }
-      updateTooltipPosition();
-    });
-
     canvas.addEventListener('click', function(e) {
+      if (dragMoved > 12) return;
       ndc.x = (e.clientX / window.innerWidth) * 2 - 1;
       ndc.y = -(e.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(ndc, camera);
@@ -773,8 +760,20 @@ const PROJECTS = getNodeProjects(locale);
         m.userData.halo.scale.setScalar(isSelected ? 1.1 : 0.7);
       });
       updateNodeDots();
+      updateNodeNavCounter();
     }
     window.__enterInspect = enterInspect;
+
+    function stepNode(dir) {
+      if (window.__heroMode !== 'explore' || mode !== 'inspect') return;
+      enterInspect((selectedNodeIndex + dir + hubCount) % hubCount);
+    }
+
+    function updateNodeNavCounter() {
+      var el = document.getElementById('node-nav-counter');
+      if (!el || selectedNodeIndex < 0) { if (el) el.textContent = ''; return; }
+      el.textContent = (selectedNodeIndex + 1) + ' / ' + hubCount;
+    }
 
     function exitInspect() {
       mode = 'explore';
@@ -795,6 +794,7 @@ const PROJECTS = getNodeProjects(locale);
         m.userData.halo.scale.setScalar(0.7);
       });
       updateNodeDots();
+      updateNodeNavCounter();
     }
 
     function updateTooltipPosition() {
@@ -806,6 +806,8 @@ const PROJECTS = getNodeProjects(locale);
     }
 
     document.getElementById('back-to-orbit').addEventListener('click', exitInspect);
+    document.getElementById('node-prev').addEventListener('click', function() { stepNode(-1); });
+    document.getElementById('node-next').addEventListener('click', function() { stepNode(1); });
 
     /* Node dots */
     var nodeDotsEl = document.getElementById('node-dots');
@@ -814,7 +816,11 @@ const PROJECTS = getNodeProjects(locale);
         return '<button class="node-dot'+(i===selectedNodeIndex?' active':'')+'" data-index="'+i+'" aria-label="Inspect '+(NODE_DATA[key].title ? NODE_DATA[key].title[currentLocale] || key : key)+'"></button>';
       }).join('');
       nodeDotsEl.querySelectorAll('.node-dot').forEach(function(btn) {
-        btn.addEventListener('click', function() { if (window.__heroMode === 'explore') enterInspect(Number(btn.dataset.index)); });
+        btn.addEventListener('click', function(ev) {
+          ev.stopPropagation();
+          if (window.__heroMode !== 'explore') return;
+          enterInspect(Number(btn.dataset.index));
+        });
       });
     }
     function updateNodeDots() {
@@ -1199,46 +1205,104 @@ const PROJECTS = getNodeProjects(locale);
 
     /* Animation loop */
     var introStart = performance.now();
-    var introDuration = 2200;
+    var introDuration = leanGfx ? 700 : 2200;
     function introProgress() { return Math.min((performance.now() - introStart) / introDuration, 1); }
     function easeOutExpo(x) { return x === 1 ? 1 : 1 - Math.pow(2, -10 * x); }
 
     var exitProgressEl = document.getElementById('exit-progress');
     var t = 0;
     var panSpeed = 0.012;
+    var renderMinInterval = leanGfx ? 1000 / 30 : 0;
+    var lastFrameTime = 0;
+    var hoverClient = null;
+    var lastHoverRaycast = 0;
 
-    function animate() {
-      rafId = requestAnimationFrame(animate);
-      if (!reducedMotion) {
-        t += 0.0022;
-        if (mode === 'explore') {
-          if (keysDown['w'] || keysDown['arrowup']) dragRotX = Math.max(-0.9, dragRotX - panSpeed);
-          if (keysDown['s'] || keysDown['arrowdown']) dragRotX = Math.min(0.9, dragRotX + panSpeed);
-          if (keysDown['a'] || keysDown['arrowleft']) dragRotY -= panSpeed;
-          if (keysDown['d'] || keysDown['arrowright']) dragRotY += panSpeed;
+    window.addEventListener('mousemove', function(e) {
+      hoverClient = { x: e.clientX, y: e.clientY };
+    });
+
+    function applyHoverRaycast(clientX, clientY) {
+      var mx = (clientX / window.innerWidth) * 2 - 1;
+      var my = (clientY / window.innerHeight) * 2 - 1;
+      if (!leanGfx) {
+        hoverRotY = mx * 0.12;
+        hoverRotX = my * 0.06;
+      }
+      ndc.x = mx;
+      ndc.y = -my;
+      raycaster.setFromCamera(ndc, camera);
+      var hits = raycaster.intersectObjects(hubMeshes);
+      if (hits.length && mode === 'explore' && !isDragging) {
+        canvas.style.cursor = 'pointer';
+        var idx = hubMeshes.indexOf(hits[0].object);
+        if (focusedIndex !== idx) {
+          focusedIndex = idx;
+          var key = CONCEPTS[idx];
+          var data = NODE_DATA[key];
+          ntTitle.textContent = data.title ? data.title[currentLocale] || key : key;
+          document.getElementById('nt-tag').textContent = data.tag;
+          document.getElementById('nt-preview').textContent = getNodePreview(getText(data.desc));
+          tooltip.classList.add('show');
         }
+      } else {
+        canvas.style.cursor = mode === 'explore' ? (isDragging ? 'grabbing' : 'grab') : '';
+        focusedIndex = -1;
+        tooltip.classList.remove('show');
+      }
+      updateTooltipPosition();
+    }
+
+    function animate(now) {
+      rafId = requestAnimationFrame(animate);
+      if (renderMinInterval && now - lastFrameTime < renderMinInterval) return;
+      lastFrameTime = now;
+
+      if (hoverClient && now - lastHoverRaycast >= (leanGfx ? 100 : 32)) {
+        lastHoverRaycast = now;
+        applyHoverRaycast(hoverClient.x, hoverClient.y);
+      }
+
+      var decorativeMotion = !reducedMotion;
+
+      if (decorativeMotion) {
+        t += 0.0022;
+      }
+      if (mode === 'explore') {
+        if (keysDown['w'] || keysDown['arrowup']) dragRotX = Math.max(-0.9, dragRotX - panSpeed);
+        if (keysDown['s'] || keysDown['arrowdown']) dragRotX = Math.min(0.9, dragRotX + panSpeed);
+        if (keysDown['a'] || keysDown['arrowleft']) dragRotY -= panSpeed;
+        if (keysDown['d'] || keysDown['arrowright']) dragRotY += panSpeed;
+      }
+
+      if (decorativeMotion) {
         group.rotation.y = t + dragRotY + hoverRotY * 0.5;
         group.rotation.x = Math.sin(t*0.6)*0.08 + dragRotX + hoverRotX * 0.3;
+      } else {
+        group.rotation.y = dragRotY;
+        group.rotation.x = dragRotX;
+      }
 
-        var ip = easeOutExpo(introProgress());
-        var thinkZoom = decomposeActive ? -0.6 : 0;
-        var homeZ = 15 - ip * (15 - zoomZ) + thinkZoom;
-        cameraHome.set(0, 0, homeZ);
+      var ip = reducedMotion ? 1 : easeOutExpo(introProgress());
+      var thinkZoom = decomposeActive ? -0.6 : 0;
+      var homeZ = 15 - ip * (15 - zoomZ) + thinkZoom;
+      cameraHome.set(0, 0, homeZ);
 
-        if (mode === 'explore') {
-          cameraTargetPos.lerp(cameraHome, 0.06);
-          cameraTargetLookAt.lerp(new THREE.Vector3(0,0,0), 0.06);
-        } else if (selectedNodeIndex >= 0) {
-          var worldPos = hubPositions[selectedNodeIndex].clone().applyMatrix4(group.matrixWorld);
-          var dir = worldPos.clone().normalize();
-          cameraTargetPos.copy(worldPos).add(dir.clone().multiplyScalar(1.6));
-          cameraTargetLookAt.copy(worldPos);
-        }
+      if (mode === 'explore') {
+        cameraTargetPos.lerp(cameraHome, decorativeMotion ? 0.06 : 0.22);
+        cameraTargetLookAt.lerp(new THREE.Vector3(0,0,0), decorativeMotion ? 0.06 : 0.22);
+      } else if (selectedNodeIndex >= 0) {
+        var worldPos = hubPositions[selectedNodeIndex].clone().applyMatrix4(group.matrixWorld);
+        var dir = worldPos.clone().normalize();
+        cameraTargetPos.copy(worldPos).add(dir.clone().multiplyScalar(1.6));
+        cameraTargetLookAt.copy(worldPos);
+      }
 
-        camera.position.lerp(cameraTargetPos, 0.055);
-        currentLookAt.lerp(cameraTargetLookAt, 0.055);
-        camera.lookAt(currentLookAt);
+      var camLerp = decorativeMotion ? 0.055 : 0.18;
+      camera.position.lerp(cameraTargetPos, camLerp);
+      currentLookAt.lerp(cameraTargetLookAt, camLerp);
+      camera.lookAt(currentLookAt);
 
+      if (decorativeMotion) {
         var pulse = decomposeActive ? (1 + Math.sin(t*22)*0.06) : 1;
         var breathing = (mode === 'explore' && !isDragging) ? (1 + Math.sin(t*1.4)*0.006) : 1;
         group.scale.setScalar(pulse * breathing);
@@ -1250,23 +1314,24 @@ const PROJECTS = getNodeProjects(locale);
 
         gridGroup.rotation.y = t * 0.15;
         gridGroup.position.y = -3.6 - (zoomZ - 9) * 0.05;
+      }
 
-        if (exitProgressEl && mode === 'explore') {
-          if (zoomZ > 10) {
-            var pct = Math.min(100, Math.max(0, (zoomZ - 9)/(21.5 - 9)*100));
-            exitProgressEl.style.width = pct + '%';
-            exitProgressEl.classList.add('show');
-          } else {
-            exitProgressEl.classList.remove('show');
-          }
+      if (exitProgressEl && mode === 'explore') {
+        if (zoomZ > 10) {
+          var pct = Math.min(100, Math.max(0, (zoomZ - 9)/(21.5 - 9)*100));
+          exitProgressEl.style.width = pct + '%';
+          exitProgressEl.classList.add('show');
+        } else {
+          exitProgressEl.classList.remove('show');
         }
       }
+
       group.updateMatrixWorld();
       updateLabels();
       updateTooltipPosition();
       renderer.render(scene, camera);
     }
-    animate();
+    animate(performance.now());
   })();
 })();
 </script>
